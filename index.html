@@ -288,17 +288,31 @@
             openModal();
         }
 
-        async function handleDelete(nama, barang) {
+       async function handleDelete(nama, barang) {
     if (confirm(`Hapus pesanan "${barang}" milik ${nama}?`)) {
-        // Tampilkan loading sederhana jika perlu
-        await fetch(API_URL, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify({ action: 'delete', nama: nama, barang: barang }) 
-        });
+        // Berikan tanda loading pada tombol agar user tahu sedang diproses
+        console.log("Mencoba menghapus:", nama, barang);
         
-        // Tunggu sebentar lalu refresh data
-        setTimeout(() => { fetchData(); }, 500);
+        try {
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ 
+                    action: 'delete', 
+                    nama: nama, 
+                    barang: barang 
+                }) 
+            });
+            
+            // Tunggu 1 detik supaya Google Sheets selesai menghapus barisnya
+            setTimeout(() => {
+                fetchData(); // Ambil data terbaru
+                alert("Perintah hapus dikirim. Jika belum hilang, silakan refresh halaman.");
+            }, 1000);
+
+        } catch (err) {
+            alert("Gagal menghubungi server.");
+        }
     }
 }
 
