@@ -169,16 +169,18 @@
             btn.innerText = "Mengirim...";
             btn.disabled = true;
 
-            const d = new Date();
-            const tglString = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+          // Di dalam file index.html Anda cari bagian ini:
+const d = new Date();
+const tglString = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 
-            const payload = {
-                tanggal: tglString,
-                nama: document.getElementById('nama').value,
-                barang: document.getElementById('barang').value,
-                jumlah: document.getElementById('jumlah').value,
-                satuan: document.getElementById('satuan').value,
-                status: 'Pending'
+const payload = {
+    tanggal: tglString, // Kirim teks biasa saja, biarkan Apps Script yang kasih tanda petik (')
+    nama: document.getElementById('nama').value,
+    barang: document.getElementById('barang').value,
+    jumlah: document.getElementById('jumlah').value,
+    satuan: document.getElementById('satuan').value,
+    status: 'Pending'
+};
             };
 
             await fetch(API_URL, {
