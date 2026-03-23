@@ -26,12 +26,11 @@
         <div class="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm animate-slide-up text-center border border-slate-200 dark:border-slate-700">
             <i class="fas fa-leaf text-4xl text-klk mb-4"></i>
             <h2 class="text-2xl font-black mb-1">PT. KMA Mill</h2>
-            <p class="text-slate-500 text-xs mb-8 font-medium italic">Silakan masuk dengan akun Anda.</p>
-            
+            <p class="text-slate-500 text-xs mb-8 font-medium italic">Masuk ke sistem operasional.</p>
             <div class="space-y-4">
                 <input type="text" id="loginUser" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Nama Pengguna">
                 <input type="password" id="loginPass" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Kata Sandi">
-                <button onclick="handleLogin()" class="w-full bg-klk text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Login</button>
+                <button onclick="handleLogin()" class="w-full bg-klk text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Masuk</button>
             </div>
         </div>
     </div>
@@ -46,16 +45,16 @@
                 <p id="activeUserDisplay" class="text-[11px] font-black text-klk mt-2 truncate"></p>
             </div>
             <nav class="flex-1 px-4 space-y-2">
-                <button onclick="currentFilter='all'; currentPage=1; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all active:scale-95 text-xs font-bold">
+                <button onclick="currentFilter='all'; currentPage=1; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all text-xs font-bold">
                     <i class="fas fa-box w-6"></i> Pesanan Saya
                 </button>
                 <div class="admin-only mt-6 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Administrator</div>
-                <button onclick="currentFilter='Pending'; currentPage=1; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-xs font-bold">
+                <button onclick="currentFilter='Pending'; currentPage=1; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-xs font-bold">
                     <i class="fas fa-clock w-6 text-yellow-500"></i> Pantau Semua
                 </button>
             </nav>
             <div class="p-6 border-t dark:border-slate-700 space-y-3">
-                <button onclick="toggleDarkMode()" class="w-full flex justify-center py-2 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest">Terang atau Gelap</button>
+                <button onclick="toggleDarkMode()" class="w-full py-2 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest">Terang atau Gelap</button>
                 <button onclick="location.reload()" class="w-full py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition">Keluar</button>
             </div>
         </aside>
@@ -70,7 +69,7 @@
                 <div class="flex flex-col md:flex-row justify-between gap-6 mb-10">
                     <div>
                         <h2 class="text-3xl font-extrabold tracking-tight">Cloud Indent</h2>
-                        <p id="userStatusNote" class="text-slate-500 mt-2 font-medium italic italic">Menampilkan pesanan pribadi Anda.</p>
+                        <p id="userStatusNote" class="text-slate-500 mt-2 font-medium italic">Menampilkan pesanan pribadi Anda.</p>
                     </div>
                     <button onclick="openModal()" class="bg-klk hover:bg-klkdark text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-plus-circle text-lg"></i> Pesanan Baru
@@ -87,18 +86,19 @@
                                     <th class="px-8 py-5">Barang</th>
                                     <th class="px-8 py-5 text-center">Jumlah</th>
                                     <th class="px-8 py-5 text-center">Status</th>
+                                    <th class="px-8 py-5 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic italic">
-                                <tr><td colspan="5" class="p-10 text-center animate-pulse">Menghubungkan...</td></tr>
+                            <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic">
+                                <tr><td colspan="6" class="p-10 text-center animate-pulse">Menghubungkan Database...</td></tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="p-6 border-t dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase text-slate-400">
+                    <div class="p-6 border-t dark:border-slate-700 flex justify-between items-center text-[10px] font-black uppercase text-slate-400">
                         <p id="paginationInfo"></p>
                         <div class="flex gap-2">
-                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl disabled:opacity-30" id="prevBtn">Prev</button>
-                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl disabled:opacity-30" id="nextBtn">Next</button>
+                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border rounded-xl disabled:opacity-30" id="prevBtn">Prev</button>
+                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border rounded-xl disabled:opacity-30" id="nextBtn">Next</button>
                         </div>
                     </div>
                 </div>
@@ -113,38 +113,38 @@
     <div id="modal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[110] p-4">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
             <div class="p-8 border-b dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-xl font-extrabold">Form Pesanan</h3>
+                <h3 id="modalTitle" class="text-xl font-extrabold">Form Pesanan</h3>
                 <button onclick="closeModal()" class="text-slate-400 text-2xl">&times;</button>
             </div>
             <form id="orderForm" class="p-8 space-y-5">
+                <input type="hidden" id="editOriginalBarang">
                 <input type="text" id="nama" readonly class="w-full bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold">
                 <input type="text" id="barang" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white" placeholder="Nama Barang">
                 <div class="grid grid-cols-2 gap-4">
                     <input type="number" id="jumlah" value="1" min="1" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold">
                     <input type="text" id="satuan" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold" placeholder="Pcs/Box">
                 </div>
-                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all">Kirim Pesanan</button>
+                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg">Simpan Pesanan</button>
             </form>
         </div>
     </div>
 
     <div id="logModal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[120] p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up p-8">
+        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up p-8 text-center">
             <h3 class="text-xl font-extrabold mb-1">Status Barang</h3>
             <p id="logBarang" class="text-klk font-bold text-xs uppercase mb-6"></p>
             <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-700">
-                <div class="relative flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10"><i class="fas fa-plus text-xs"></i></div><div><p class="font-bold text-sm">Pesanan Diterima</p><p id="logTglPesan" class="text-[10px] text-slate-400"></p></div></div>
-                <div class="relative flex items-center gap-4"><div id="iconIndent" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-truck-loading text-xs"></i></div><div><p class="font-bold text-sm">Status Indent</p><p id="logTglIndent" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
-                <div class="relative flex items-center gap-4"><div id="iconSelesai" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-check-circle text-xs"></i></div><div><p class="font-bold text-sm">Tiba / Selesai</p><p id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
+                <div class="relative flex items-center gap-4 text-left"><div class="w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10"><i class="fas fa-plus text-xs"></i></div><div><p class="font-bold text-sm">Pesanan Diterima</p><p id="logTglPesan" class="text-[10px] text-slate-400"></p></div></div>
+                <div class="relative flex items-center gap-4 text-left"><div id="iconIndent" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-truck-loading text-xs"></i></div><div><p class="font-bold text-sm">Status Indent</p><p id="logTglIndent" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
+                <div class="relative flex items-center gap-4 text-left"><div id="iconSelesai" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-check-circle text-xs"></i></div><div><p class="font-bold text-sm">Selesai</p><p id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
             </div>
-            <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Tutup</button>
+            <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-[10px] uppercase">Tutup</button>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzg0bS9ScLtKqpWuqxt7Fi1j_lwZIi_2Uib2r0fuBeoPQ0FNOpVKgkc9bej-LTbtzJ3/exec";
         
-        // --- DATA USER INTERNAL (Edit Di Sini) ---
         const USER_DATABASE = [
             { user: "wira", pass: "shift1" },
             { user: "azis", pass: "shift2" },
@@ -167,14 +167,12 @@
         let currentPage = 1;
         const rowsPerPage = 10;
         let activeUser = "";
+        let isEditMode = false;
 
-        // LOGIN SYSTEM
         function handleLogin() {
             const u = document.getElementById('loginUser').value.trim();
             const p = document.getElementById('loginPass').value.trim();
-            
             const foundUser = USER_DATABASE.find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
-            
             if (foundUser) {
                 activeUser = foundUser.user;
                 document.getElementById('loginOverlay').classList.add('hidden');
@@ -182,9 +180,7 @@
                 document.getElementById('activeUserDisplay').innerText = activeUser;
                 document.getElementById('nama').value = activeUser;
                 fetchData();
-            } else {
-                alert("Login Gagal! Nama atau Password salah.");
-            }
+            } else { alert("Login Gagal!"); }
         }
 
         async function fetchData() {
@@ -220,19 +216,16 @@
             document.getElementById('nextBtn').disabled = currentPage === totalPages;
 
             tbody.innerHTML = '';
-            if (paginatedData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 italic">Data kosong.</td></tr>`;
-                return;
-            }
-
             paginatedData.forEach((order) => {
                 let sCol = "bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20";
                 if(order.status === 'Indent') sCol = "bg-blue-50 text-blue-600 dark:bg-blue-900/20";
                 if(order.status === 'Selesai') sCol = "bg-green-50 text-klk dark:bg-green-900/20";
 
+                const canEdit = isAdmin || order.status === 'Pending';
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700 cursor-pointer";
-                tr.onclick = (e) => { if(e.target.tagName !== 'SELECT') showLog(order); };
+                tr.onclick = (e) => { if(!e.target.closest('button') && e.target.tagName !== 'SELECT') showLog(order); };
                 tr.innerHTML = `
                     <td class="px-8 py-5 text-[10px] text-slate-400 font-mono">${order.tanggal}</td>
                     <td class="px-8 py-5 font-bold ${isAdmin ? '' : 'hidden'}">${order.nama}</td>
@@ -248,51 +241,90 @@
                             `<span class="${sCol} px-4 py-1.5 rounded-full text-[10px] font-black uppercase">${order.status}</span>`
                         }
                     </td>
+                    <td class="px-8 py-5 text-center flex justify-center gap-2">
+                        ${canEdit ? `
+                            <button onclick="openEditModal('${order.nama}', '${order.barang}', ${order.jumlah}, '${order.satuan}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition"><i class="fas fa-edit"></i></button>
+                            <button onclick="handleDelete('${order.nama}', '${order.barang}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition"><i class="fas fa-trash-alt"></i></button>
+                        ` : '<span class="text-[9px] text-slate-300">Diproses</span>'}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // LOG MODAL
-        function showLog(order) {
-            document.getElementById('logBarang').innerText = `${order.barang}`;
-            document.getElementById('logTglPesan').innerText = order.tanggal;
-            const iI = document.getElementById('iconIndent'), iS = document.getElementById('iconSelesai'), tI = document.getElementById('logTglIndent'), tS = document.getElementById('logTglSelesai');
-            if(order.status === 'Pending') { iI.className = iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; tI.innerText = "Belum diproses"; tS.innerText = "Menunggu"; }
-            else if (order.status === 'Indent') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10 shadow-lg"; iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; tI.innerText = "Sudah diproses"; tS.innerText = "Menunggu tiba"; }
-            else if (order.status === 'Selesai') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10"; iS.className = "w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10 shadow-lg"; tI.innerText = "Selesai"; tS.innerText = "Telah diterima"; }
-            document.getElementById('logModal').classList.remove('hidden');
+        // --- FUNGSI AKSI ---
+        function openEditModal(nama, barang, jumlah, satuan) {
+            isEditMode = true;
+            document.getElementById('modalTitle').innerText = "Edit Pesanan";
+            document.getElementById('editOriginalBarang').value = barang;
+            document.getElementById('barang').value = barang;
+            document.getElementById('jumlah').value = jumlah;
+            document.getElementById('satuan').value = satuan;
+            openModal();
         }
 
-        function closeLog() { document.getElementById('logModal').classList.add('hidden'); }
-        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
-        function nextPage() { if (currentPage < Math.ceil(orders.length / rowsPerPage)) { currentPage++; renderTable(); } }
-        function openModal() { document.getElementById('modal').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+        async function handleDelete(nama, barang) {
+            if (confirm(`Hapus pesanan "${barang}"?`)) {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', nama: nama, barang: barang }) });
+                fetchData();
+            }
+        }
 
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn'); btn.innerText = "Mengirim..."; btn.disabled = true;
+            const btn = document.getElementById('submitBtn'); btn.innerText = "Memproses..."; btn.disabled = true;
             const d = new Date(); const tgl = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-            const payload = { tanggal: tgl, nama: activeUser, barang: document.getElementById('barang').value, jumlah: document.getElementById('jumlah').value, satuan: document.getElementById('satuan').value, status: 'Pending' };
+            
+            const payload = {
+                action: isEditMode ? 'update_full' : 'create',
+                oldBarang: document.getElementById('editOriginalBarang').value,
+                tanggal: tgl,
+                nama: activeUser,
+                barang: document.getElementById('barang').value,
+                jumlah: document.getElementById('jumlah').value,
+                satuan: document.getElementById('satuan').value,
+                status: 'Pending'
+            };
+
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            document.getElementById('orderForm').reset(); document.getElementById('nama').value = activeUser;
-            closeModal(); btn.innerText = "Kirim Pesanan"; btn.disabled = false; fetchData();
+            closeModal(); 
+            btn.innerText = "Simpan Pesanan"; btn.disabled = false; 
+            fetchData();
         });
 
+        // UI HELPERS
+        function openModal() { document.getElementById('modal').classList.remove('hidden'); }
+        function closeModal() { 
+            document.getElementById('modal').classList.add('hidden'); 
+            document.getElementById('orderForm').reset();
+            document.getElementById('nama').value = activeUser;
+            document.getElementById('modalTitle').innerText = "Pesanan Baru";
+            isEditMode = false;
+        }
+        function showLog(order) {
+            document.getElementById('logBarang').innerText = `${order.barang}`;
+            document.getElementById('logTglPesan').innerText = order.tanggal;
+            const iI = document.getElementById('iconIndent'), iS = document.getElementById('iconSelesai');
+            if(order.status === 'Pending') { iI.className = iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; }
+            else if (order.status === 'Indent') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10 shadow-lg"; iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; }
+            else if (order.status === 'Selesai') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10"; iS.className = "w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10 shadow-lg"; }
+            document.getElementById('logModal').classList.remove('hidden');
+        }
+        function closeLog() { document.getElementById('logModal').classList.add('hidden'); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { if (currentPage < Math.ceil(orders.length / rowsPerPage)) { currentPage++; renderTable(); } }
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+        function toggleAdmin() {
+            if (!isAdmin) { if (prompt("Password Admin:") === "KLK2026") { isAdmin = true; document.body.classList.add('is-admin'); document.getElementById('role-tag').innerText = "Admin View"; document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk"; } }
+            else { isAdmin = false; document.body.classList.remove('is-admin'); document.getElementById('role-tag').innerText = "User Session"; document.getElementById('lock-icon-float').className = "fas fa-lock"; }
+            renderTable();
+        }
         async function updateStatusRemote(nama, barang, statusBaru) {
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'update', nama: nama, barang: barang, status: statusBaru }) });
             fetchData();
         }
 
-        function toggleAdmin() {
-            if (!isAdmin) { if (prompt("Password Admin PT. KMA Mill:") === "KLK2026") { isAdmin = true; document.body.classList.add('is-admin'); document.getElementById('role-tag').innerText = "Admin View"; document.getElementById('userStatusNote').innerText = "Mode Admin: Menampilkan seluruh data pesanan."; document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk"; } }
-            else { isAdmin = false; document.body.classList.remove('is-admin'); document.getElementById('role-tag').innerText = "User Session"; document.getElementById('userStatusNote').innerText = "Menampilkan pesanan pribadi Anda."; document.getElementById('lock-icon-float').className = "fas fa-lock"; }
-            renderTable();
-        }
-
-        setInterval(fetchData, 30000);
+        setInterval(fetchData, 45000);
     </script>
 </body>
 </html>
