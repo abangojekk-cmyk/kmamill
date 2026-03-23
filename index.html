@@ -184,16 +184,41 @@
         }
 
         async function fetchData() {
-            try {
-                const response = await fetch(API_URL);
-                const rawData = await response.json();
-                orders = rawData.map(row => ({
-                    tanggal: String(row[0] || "").replace(/^'/, ''), 
-                    nama: row[1], barang: row[2], jumlah: row[3], satuan: row[4], status: row[5]
-                })).reverse();
-                renderTable();
-            } catch (e) { console.error(e); }
-        }
+    try {
+        const response = await fetch(API_URL);
+        const rawData = await response.json();
+        
+        orders = rawData.map(row => {
+            let tglMentah = row[0];
+            let tglRapi = "";
+
+            // Fungsi pembersih tanggal ISO ke format Indonesia (DD/MM/YYYY)
+            if (tglMentah && String(tglMentah).includes('T')) {
+                const d = new Date(tglMentah);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                tglRapi = `${day}/${month}/${year}`;
+            } else {
+                // Jika sudah rapi atau format lain, hapus tanda petik satu (') jika ada
+                tglRapi = String(tglMentah || "").replace(/^'/, '');
+            }
+
+            return {
+                tanggal: tglRapi, 
+                nama: row[1], 
+                barang: row[2], 
+                jumlah: row[3], 
+                satuan: row[4], 
+                status: row[5]
+            };
+        }).reverse();
+        
+        renderTable();
+    } catch (e) { 
+        console.error("Gagal memuat data:", e); 
+    }
+}
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
