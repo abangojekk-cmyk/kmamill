@@ -19,38 +19,52 @@
         body.is-admin .admin-only { display: block; }
         body { transition: background-color 0.5s ease; }
         tr.cursor-pointer:hover { background-color: rgba(34, 197, 94, 0.05); }
+        #loginOverlay { backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 overflow-hidden">
 
-    <div class="flex flex-col md:flex-row h-screen overflow-hidden">
-        
+    <div id="loginOverlay" class="fixed inset-0 z-[200] bg-slate-900/90 flex items-center justify-center p-6 transition-all">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md animate-slide-up text-center border border-slate-200 dark:border-slate-700">
+            <i class="fas fa-leaf text-4xl text-klk mb-4"></i>
+            <h2 class="text-2xl font-black mb-2">PT. KMA Mill</h2>
+            <p class="text-slate-500 text-sm mb-8 font-medium italic">Silakan masukkan nama Anda untuk melihat pesanan.</p>
+            <input type="text" id="userInputName" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 mb-4 outline-none text-center font-bold" placeholder="Nama Lengkap Anda">
+            <button onclick="userLogin()" class="w-full bg-klk text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Masuk Ke Sistem</button>
+        </div>
+    </div>
+
+    <div id="mainApp" class="flex flex-col md:flex-row h-screen overflow-hidden hidden">
         <aside class="hidden md:flex w-64 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex-col shadow-sm">
             <div class="p-8">
                 <h1 class="text-xl font-black text-klk tracking-tighter uppercase flex items-center gap-2">
                     <i class="fas fa-leaf text-2xl"></i> PT. KMA Mill
                 </h1>
-                <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Staff Mode</p>
+                <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">Personal Mode</p>
+                <p id="activeUserDisplay" class="text-[11px] font-black text-klk mt-2 truncate"></p>
             </div>
             <nav class="flex-1 px-4 space-y-2">
-                <button onclick="currentFilter='all'; currentPage=1; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all active:scale-95">
-                    <i class="fas fa-th-large w-6"></i> Semua Pesanan
+                <button onclick="currentFilter='all'; currentPage=1; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all active:scale-95 text-xs font-bold">
+                    <i class="fas fa-box w-6"></i> Pesanan Saya
                 </button>
                 <div class="admin-only mt-6 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin Tools</div>
-                <button onclick="currentFilter='Pending'; currentPage=1; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition">
-                    <i class="fas fa-clock w-6 text-yellow-500"></i> Cek Pending
+                <button onclick="currentFilter='Pending'; currentPage=1; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-xs font-bold">
+                    <i class="fas fa-clock w-6 text-yellow-500"></i> Semua Pending
                 </button>
             </nav>
             <div class="p-6 border-t dark:border-slate-700 space-y-3">
                 <button onclick="toggleDarkMode()" class="w-full flex items-center justify-center gap-2 py-2 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
-                    <i id="theme-icon" class="fas fa-sun"></i> <span id="theme-text">Terang atau Gelap</span>
+                    <i id="theme-icon" class="fas fa-sun"></i> <span>Terang atau Gelap</span>
+                </button>
+                <button onclick="userLogout()" class="w-full flex items-center justify-center gap-2 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all hover:bg-red-500 hover:text-white">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
                 </button>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-hidden">
             <header class="md:hidden bg-white dark:bg-slate-800 p-4 border-b dark:border-slate-700 flex justify-between items-center shadow-sm">
-                <h1 class="text-lg font-black text-klk uppercase">PT. KMA Mill</h1>
+                <h1 class="text-lg font-black text-klk uppercase italic">PT. KMA Mill</h1>
                 <button onclick="toggleAdmin()" class="text-slate-400 p-2"><i class="fas fa-lock"></i></button>
             </header>
 
@@ -58,15 +72,11 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight leading-none">Internal Order</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium italic italic">Klik baris untuk riwayat.</p>
+                        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium italic">Data milik Anda pribadi.</p>
                     </div>
                     <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                        <div class="relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                            <input type="text" id="searchInput" oninput="currentPage=1; renderTable();" placeholder="Cari barang/nama..." class="w-full md:w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 pl-10 pr-4 py-4 rounded-2xl text-xs outline-none focus:border-klk transition-all shadow-sm">
-                        </div>
                         <button onclick="openModal()" class="bg-klk hover:bg-klkdark text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-green-200 transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <i class="fas fa-plus-circle text-lg"></i> Pesanan Baru
+                            <i class="fas fa-plus-circle text-lg"></i> Buat Pesanan
                         </button>
                     </div>
                 </div>
@@ -77,23 +87,23 @@
                             <thead>
                                 <tr class="bg-slate-50/50 dark:bg-slate-700/50 border-b dark:border-slate-700 text-[11px] font-black text-slate-400 uppercase tracking-widest">
                                     <th class="px-8 py-5">Tanggal</th>
-                                    <th class="px-8 py-5">Pemesan</th>
+                                    <th class="px-8 py-5 admin-only">Pemesan</th>
                                     <th class="px-8 py-5">Nama Barang</th>
                                     <th class="px-8 py-5 text-center">Jumlah</th>
                                     <th class="px-8 py-5 text-center">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic">
-                                <tr><td colspan="5" class="p-10 text-center animate-pulse">Menghubungkan...</td></tr>
+                                <tr><td colspan="5" class="p-10 text-center animate-pulse">Memuat data Anda...</td></tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <div class="p-6 bg-slate-50/30 dark:bg-slate-800/50 border-t dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p id="paginationInfo" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic"></p>
+                    <div class="p-6 bg-slate-50/30 dark:bg-slate-800/50 border-t dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
+                        <p id="paginationInfo"></p>
                         <div class="flex gap-2">
-                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-[10px] font-black uppercase hover:bg-slate-100 transition disabled:opacity-30" id="prevBtn">Prev</button>
-                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-[10px] font-black uppercase hover:bg-slate-100 transition disabled:opacity-30" id="nextBtn">Next</button>
+                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl hover:bg-slate-100 disabled:opacity-30" id="prevBtn">Prev</button>
+                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl hover:bg-slate-100 disabled:opacity-30" id="nextBtn">Next</button>
                         </div>
                     </div>
                 </div>
@@ -112,55 +122,27 @@
                 <button onclick="closeModal()" class="text-slate-400 text-2xl">&times;</button>
             </div>
             <form id="orderForm" class="p-8 space-y-5">
-                <input type="text" id="nama" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white" placeholder="Nama Pemesan">
+                <input type="text" id="nama" readonly class="w-full bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-slate-400 font-bold" placeholder="Nama Pemesan">
                 <input type="text" id="barang" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white" placeholder="Nama Barang">
                 <div class="grid grid-cols-2 gap-4">
                     <input type="number" id="jumlah" value="1" min="1" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold">
                     <input type="text" id="satuan" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold" placeholder="Pcs/Box">
                 </div>
-                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all">Kirim Ke Database</button>
+                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all">Kirim Pesanan</button>
             </form>
         </div>
     </div>
 
     <div id="logModal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[120] p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
-            <div class="p-8 border-b dark:border-slate-700">
-                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Riwayat Pesanan</h3>
-                <p id="logBarang" class="text-klk font-bold text-sm uppercase"></p>
+        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up p-8">
+            <h3 class="text-xl font-extrabold mb-1">Riwayat Barang</h3>
+            <p id="logBarang" class="text-klk font-bold text-xs uppercase mb-6"></p>
+            <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-700">
+                <div class="relative flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10"><i class="fas fa-plus text-xs"></i></div><div><p class="font-bold text-sm">Pesanan Dibuat</p><p id="logTglPesan" class="text-[10px] text-slate-400"></p></div></div>
+                <div class="relative flex items-center gap-4"><div id="iconIndent" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-truck-loading text-xs"></i></div><div><p class="font-bold text-sm">Status Indent</p><p id="logTglIndent" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
+                <div class="relative flex items-center gap-4"><div id="iconSelesai" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-check-circle text-xs"></i></div><div><p class="font-bold text-sm">Selesai/Diterima</p><p id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
             </div>
-            <div class="p-8">
-                <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-                    <div class="relative flex items-center justify-between md:justify-start">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
-                            <i class="fas fa-plus text-xs"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="font-bold text-slate-800 dark:text-white">Pesanan Dibuat</div>
-                            <div id="logTglPesan" class="text-[10px] text-slate-400">--/--/----</div>
-                        </div>
-                    </div>
-                    <div class="relative flex items-center justify-between md:justify-start">
-                        <div id="iconIndent" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
-                            <i class="fas fa-truck-loading text-xs"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="font-bold text-slate-800 dark:text-white">Status Indent</div>
-                            <div id="logTglIndent" class="text-[10px] text-slate-400 italic">Belum diproses</div>
-                        </div>
-                    </div>
-                    <div class="relative flex items-center justify-between md:justify-start">
-                        <div id="iconSelesai" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
-                            <i class="fas fa-check-circle text-xs"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="font-bold text-slate-800 dark:text-white">Barang Diterima</div>
-                            <div id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu penyelesaian</div>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Tutup</button>
-            </div>
+            <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Tutup</button>
         </div>
     </div>
 
@@ -171,6 +153,23 @@
         let currentFilter = 'all';
         let currentPage = 1;
         const rowsPerPage = 10;
+        let activeUser = "";
+
+        // LOGIN SYSTEM
+        function userLogin() {
+            const nameInput = document.getElementById('userInputName').value.trim();
+            if (nameInput.length < 3) return alert("Masukkan nama lengkap Anda!");
+            activeUser = nameInput;
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('activeUserDisplay').innerText = activeUser;
+            document.getElementById('nama').value = activeUser;
+            fetchData();
+        }
+
+        function userLogout() {
+            location.reload();
+        }
 
         async function fetchData() {
             try {
@@ -186,49 +185,50 @@
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
             
+            // FILTER BERDASARKAN USER AKTIF (KECUALI ADMIN)
             let filteredData = orders;
-            if (currentFilter !== 'all') filteredData = filteredData.filter(o => o.status === currentFilter);
-            if (searchVal) {
-                filteredData = filteredData.filter(o => 
-                    o.nama.toLowerCase().includes(searchVal) || 
-                    o.barang.toLowerCase().includes(searchVal)
-                );
+            if (!isAdmin) {
+                filteredData = filteredData.filter(o => o.nama.toLowerCase() === activeUser.toLowerCase());
+            } else if (currentFilter !== 'all') {
+                filteredData = filteredData.filter(o => o.status === currentFilter);
             }
 
             const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            const paginatedData = filteredData.slice(startIndex, endIndex);
-
+            const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
             const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
-            document.getElementById('paginationInfo').innerText = `Halaman ${currentPage} dari ${totalPages} (${filteredData.length} Data)`;
+            
+            document.getElementById('paginationInfo').innerText = `Hal ${currentPage}/${totalPages} (${filteredData.length} Data)`;
             document.getElementById('prevBtn').disabled = currentPage === 1;
             document.getElementById('nextBtn').disabled = currentPage === totalPages;
 
             tbody.innerHTML = '';
+            if (paginatedData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 italic">Tidak ada pesanan atas nama Anda.</td></tr>`;
+                return;
+            }
+
             paginatedData.forEach((order) => {
-                let statusColor = "bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400";
-                if(order.status === 'Indent') statusColor = "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400";
-                if(order.status === 'Selesai') statusColor = "bg-green-50 text-klk dark:bg-green-900/20 dark:text-klk";
+                let sCol = "bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20";
+                if(order.status === 'Indent') sCol = "bg-blue-50 text-blue-600 dark:bg-blue-900/20";
+                if(order.status === 'Selesai') sCol = "bg-green-50 text-klk dark:bg-green-900/20";
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700 cursor-pointer";
                 tr.onclick = (e) => { if(e.target.tagName !== 'SELECT') showLog(order); };
-
                 tr.innerHTML = `
-                    <td class="px-8 py-5 text-[11px] text-slate-400 font-mono tracking-tight">${order.tanggal}</td>
-                    <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.nama}</td>
-                    <td class="px-8 py-5 text-slate-600 dark:text-slate-400">${order.barang}</td>
-                    <td class="px-8 py-5 text-center font-black">${order.jumlah} <span class="text-[9px] opacity-40 font-normal ml-1">${order.satuan}</span></td>
+                    <td class="px-8 py-5 text-[10px] text-slate-400 font-mono">${order.tanggal}</td>
+                    <td class="px-8 py-5 font-bold admin-only">${order.nama}</td>
+                    <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.barang}</td>
+                    <td class="px-8 py-5 text-center font-black">${order.jumlah} <span class="text-[9px] opacity-40 ml-1">${order.satuan}</span></td>
                     <td class="px-8 py-5 text-center">
                         ${isAdmin ? 
-                            `<select onchange="updateStatusRemote('${order.nama}', '${order.barang}', this.value)" class="${statusColor} text-[10px] font-black uppercase px-3 py-1 rounded-full outline-none cursor-pointer">
+                            `<select onchange="updateStatusRemote('${order.nama}', '${order.barang}', this.value)" class="${sCol} text-[10px] font-black uppercase px-3 py-1 rounded-full outline-none">
                                 <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
                                 <option value="Indent" ${order.status === 'Indent' ? 'selected' : ''}>Indent</option>
                                 <option value="Selesai" ${order.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
                             </select>` : 
-                            `<span class="${statusColor} px-4 py-1.5 rounded-full text-[10px] font-black uppercase">${order.status}</span>`
+                            `<span class="${sCol} px-4 py-1.5 rounded-full text-[10px] font-black uppercase">${order.status}</span>`
                         }
                     </td>
                 `;
@@ -236,45 +236,32 @@
             });
         }
 
-        // FUNGSI RIWAYAT (LOG)
+        // LOGIKA LAINNYA TETAP SAMA
         function showLog(order) {
-            document.getElementById('logBarang').innerText = `${order.barang} (${order.nama})`;
+            document.getElementById('logBarang').innerText = `${order.barang}`;
             document.getElementById('logTglPesan').innerText = order.tanggal;
-            
-            const iIndent = document.getElementById('iconIndent');
-            const iSelesai = document.getElementById('iconSelesai');
-            const tIndent = document.getElementById('logTglIndent');
-            const tSelesai = document.getElementById('logTglSelesai');
-
-            if(order.status === 'Pending') {
-                iIndent.className = iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0";
-                tIndent.innerText = "Belum diproses"; tSelesai.innerText = "Menunggu penyelesaian";
-            } else if (order.status === 'Indent') {
-                iIndent.className = "flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white z-10 shadow-lg";
-                iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10";
-                tIndent.innerText = "Sudah dipesan (Indent)"; tSelesai.innerText = "Menunggu barang tiba";
-            } else if (order.status === 'Selesai') {
-                iIndent.className = "flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white z-10";
-                iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-klk text-white z-10 shadow-lg";
-                tIndent.innerText = "Sudah diproses"; tSelesai.innerText = "Sudah diterima";
-            }
+            const iI = document.getElementById('iconIndent'), iS = document.getElementById('iconSelesai'), tI = document.getElementById('logTglIndent'), tS = document.getElementById('logTglSelesai');
+            if(order.status === 'Pending') { iI.className = iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; tI.innerText = "Belum diproses"; tS.innerText = "Menunggu"; }
+            else if (order.status === 'Indent') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10 shadow-lg"; iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; tI.innerText = "Sudah diproses"; tS.innerText = "Menunggu tiba"; }
+            else if (order.status === 'Selesai') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10"; iS.className = "w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10 shadow-lg"; tI.innerText = "Selesai"; tS.innerText = "Telah diterima"; }
             document.getElementById('logModal').classList.remove('hidden');
         }
 
         function closeLog() { document.getElementById('logModal').classList.add('hidden'); }
         function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
-        function nextPage() { 
-            const totalPages = Math.ceil(orders.length / rowsPerPage);
-            if (currentPage < totalPages) { currentPage++; renderTable(); } 
-        }
+        function nextPage() { if (currentPage < Math.ceil(orders.length / rowsPerPage)) { currentPage++; renderTable(); } }
+        function openModal() { document.getElementById('modal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
 
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn'); btn.innerText = "Mengirim..."; btn.disabled = true;
-            const d = new Date(); const tglString = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-            const payload = { tanggal: tglString, nama: document.getElementById('nama').value, barang: document.getElementById('barang').value, jumlah: document.getElementById('jumlah').value, satuan: document.getElementById('satuan').value, status: 'Pending' };
+            const d = new Date(); const tgl = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            const payload = { tanggal: tgl, nama: activeUser, barang: document.getElementById('barang').value, jumlah: document.getElementById('jumlah').value, satuan: document.getElementById('satuan').value, status: 'Pending' };
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            document.getElementById('orderForm').reset(); closeModal(); btn.innerText = "Kirim Ke Database"; btn.disabled = false; fetchData();
+            document.getElementById('orderForm').reset(); document.getElementById('nama').value = activeUser;
+            closeModal(); btn.innerText = "Kirim Pesanan"; btn.disabled = false; fetchData();
         });
 
         async function updateStatusRemote(nama, barang, statusBaru) {
@@ -283,32 +270,11 @@
         }
 
         function toggleAdmin() {
-            if (!isAdmin) {
-                if (prompt("Password Admin PT. KMA Mill:") === "KLK2026") {
-                    isAdmin = true;
-                    document.body.classList.add('is-admin');
-                    document.getElementById('role-tag').innerText = "Admin Mode";
-                    document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk";
-                }
-            } else {
-                isAdmin = false;
-                document.body.classList.remove('is-admin');
-                document.getElementById('role-tag').innerText = "Staff Mode";
-                document.getElementById('lock-icon-float').className = "fas fa-lock";
-            }
+            if (!isAdmin) { if (prompt("Password Admin PT. KMA Mill:") === "KLK2026") { isAdmin = true; document.body.classList.add('is-admin'); document.getElementById('role-tag').innerText = "Admin Mode"; document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk"; } }
+            else { isAdmin = false; document.body.classList.remove('is-admin'); document.getElementById('role-tag').innerText = "Personal Mode"; document.getElementById('lock-icon-float').className = "fas fa-lock"; }
             renderTable();
         }
 
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-        }
-
-        function openModal() { document.getElementById('modal').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-
-        fetchData();
         setInterval(fetchData, 30000);
     </script>
 </body>
