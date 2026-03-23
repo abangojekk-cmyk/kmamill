@@ -18,6 +18,7 @@
         .admin-only { display: none; }
         body.is-admin .admin-only { display: block; }
         body { transition: background-color 0.5s ease; }
+        tr.cursor-pointer:hover { background-color: rgba(34, 197, 94, 0.05); }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 overflow-hidden">
@@ -57,7 +58,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                     <div>
                         <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight leading-none">Internal Order</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium italic">Sistem Monitoring PT. KMA Mill</p>
+                        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium italic italic">Klik baris untuk riwayat.</p>
                     </div>
                     <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                         <div class="relative">
@@ -83,7 +84,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic">
-                                <tr><td colspan="5" class="p-10 text-center animate-pulse">Menghubungkan ke Database...</td></tr>
+                                <tr><td colspan="5" class="p-10 text-center animate-pulse">Menghubungkan...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -107,7 +108,7 @@
     <div id="modal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[110] p-4">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
             <div class="p-8 border-b dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white tracking-tight">Form Pesanan</h3>
+                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Form Pesanan</h3>
                 <button onclick="closeModal()" class="text-slate-400 text-2xl">&times;</button>
             </div>
             <form id="orderForm" class="p-8 space-y-5">
@@ -117,8 +118,49 @@
                     <input type="number" id="jumlah" value="1" min="1" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold">
                     <input type="text" id="satuan" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold" placeholder="Pcs/Box">
                 </div>
-                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Kirim Ke Database</button>
+                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all">Kirim Ke Database</button>
             </form>
+        </div>
+    </div>
+
+    <div id="logModal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[120] p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+            <div class="p-8 border-b dark:border-slate-700">
+                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Riwayat Pesanan</h3>
+                <p id="logBarang" class="text-klk font-bold text-sm uppercase"></p>
+            </div>
+            <div class="p-8">
+                <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                    <div class="relative flex items-center justify-between md:justify-start">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
+                            <i class="fas fa-plus text-xs"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-slate-800 dark:text-white">Pesanan Dibuat</div>
+                            <div id="logTglPesan" class="text-[10px] text-slate-400">--/--/----</div>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center justify-between md:justify-start">
+                        <div id="iconIndent" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
+                            <i class="fas fa-truck-loading text-xs"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-slate-800 dark:text-white">Status Indent</div>
+                            <div id="logTglIndent" class="text-[10px] text-slate-400 italic">Belum diproses</div>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center justify-between md:justify-start">
+                        <div id="iconSelesai" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
+                            <i class="fas fa-check-circle text-xs"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-slate-800 dark:text-white">Barang Diterima</div>
+                            <div id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu penyelesaian</div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Tutup</button>
+            </div>
         </div>
     </div>
 
@@ -127,8 +169,6 @@
         let orders = [];
         let isAdmin = false;
         let currentFilter = 'all';
-        
-        // VARIABLE PAGINATION
         let currentPage = 1;
         const rowsPerPage = 10;
 
@@ -136,7 +176,6 @@
             try {
                 const response = await fetch(API_URL);
                 const rawData = await response.json();
-                // Data terbaru di paling atas
                 orders = rawData.map(row => ({
                     tanggal: String(row[0] || "").replace(/^'/, ''), 
                     nama: row[1], barang: row[2], jumlah: row[3], satuan: row[4], status: row[5]
@@ -149,7 +188,6 @@
             const tbody = document.getElementById('tableBody');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
             
-            // 1. Filter Data (Berdasarkan Status & Pencarian)
             let filteredData = orders;
             if (currentFilter !== 'all') filteredData = filteredData.filter(o => o.status === currentFilter);
             if (searchVal) {
@@ -159,14 +197,12 @@
                 );
             }
 
-            // 2. Potong Data untuk Pagination
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
             const paginatedData = filteredData.slice(startIndex, endIndex);
 
-            // 3. Update Info Pagination
             const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
-            document.getElementById('paginationInfo').innerText = `Halaman ${currentPage} dari ${totalPages} (${filteredData.length} Pesanan)`;
+            document.getElementById('paginationInfo').innerText = `Halaman ${currentPage} dari ${totalPages} (${filteredData.length} Data)`;
             document.getElementById('prevBtn').disabled = currentPage === 1;
             document.getElementById('nextBtn').disabled = currentPage === totalPages;
 
@@ -177,7 +213,9 @@
                 if(order.status === 'Selesai') statusColor = "bg-green-50 text-klk dark:bg-green-900/20 dark:text-klk";
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700";
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700 cursor-pointer";
+                tr.onclick = (e) => { if(e.target.tagName !== 'SELECT') showLog(order); };
+
                 tr.innerHTML = `
                     <td class="px-8 py-5 text-[11px] text-slate-400 font-mono tracking-tight">${order.tanggal}</td>
                     <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.nama}</td>
@@ -198,28 +236,45 @@
             });
         }
 
-        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
-        function nextPage() { 
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
-            let filteredData = orders;
-            if (currentFilter !== 'all') filteredData = filteredData.filter(o => o.status === currentFilter);
-            if (searchVal) filteredData = filteredData.filter(o => o.nama.toLowerCase().includes(searchVal) || o.barang.toLowerCase().includes(searchVal));
+        // FUNGSI RIWAYAT (LOG)
+        function showLog(order) {
+            document.getElementById('logBarang').innerText = `${order.barang} (${order.nama})`;
+            document.getElementById('logTglPesan').innerText = order.tanggal;
             
-            if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) { currentPage++; renderTable(); } 
+            const iIndent = document.getElementById('iconIndent');
+            const iSelesai = document.getElementById('iconSelesai');
+            const tIndent = document.getElementById('logTglIndent');
+            const tSelesai = document.getElementById('logTglSelesai');
+
+            if(order.status === 'Pending') {
+                iIndent.className = iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0";
+                tIndent.innerText = "Belum diproses"; tSelesai.innerText = "Menunggu penyelesaian";
+            } else if (order.status === 'Indent') {
+                iIndent.className = "flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white z-10 shadow-lg";
+                iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10";
+                tIndent.innerText = "Sudah dipesan (Indent)"; tSelesai.innerText = "Menunggu barang tiba";
+            } else if (order.status === 'Selesai') {
+                iIndent.className = "flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white z-10";
+                iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-klk text-white z-10 shadow-lg";
+                tIndent.innerText = "Sudah diproses"; tSelesai.innerText = "Sudah diterima";
+            }
+            document.getElementById('logModal').classList.remove('hidden');
         }
 
-        // FUNGSI DASAR (TIDAK BERUBAH)
+        function closeLog() { document.getElementById('logModal').classList.add('hidden'); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { 
+            const totalPages = Math.ceil(orders.length / rowsPerPage);
+            if (currentPage < totalPages) { currentPage++; renderTable(); } 
+        }
+
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.innerText = "Mengirim..."; btn.disabled = true;
-            const d = new Date();
-            const tglString = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            const btn = document.getElementById('submitBtn'); btn.innerText = "Mengirim..."; btn.disabled = true;
+            const d = new Date(); const tglString = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
             const payload = { tanggal: tglString, nama: document.getElementById('nama').value, barang: document.getElementById('barang').value, jumlah: document.getElementById('jumlah').value, satuan: document.getElementById('satuan').value, status: 'Pending' };
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            document.getElementById('orderForm').reset(); closeModal();
-            btn.innerText = "Kirim Ke Database"; btn.disabled = false;
-            fetchData();
+            document.getElementById('orderForm').reset(); closeModal(); btn.innerText = "Kirim Ke Database"; btn.disabled = false; fetchData();
         });
 
         async function updateStatusRemote(nama, barang, statusBaru) {
@@ -254,7 +309,7 @@
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
         fetchData();
-        setInterval(fetchData, 30000); // Sinkron tiap 30 detik untuk menghemat baterai/data
+        setInterval(fetchData, 30000);
     </script>
 </body>
 </html>
