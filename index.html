@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PT. KMA Mill - Internal Order</title>
+    <title>PT. KMA Mill - Cloud Indent System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
@@ -18,67 +18,63 @@
         .admin-only { display: none; }
         body.is-admin .admin-only { display: block; }
         body { transition: background-color 0.5s ease; }
-        tr.cursor-pointer:hover { background-color: rgba(34, 197, 94, 0.05); }
-        #loginOverlay { backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 overflow-hidden">
 
-    <div id="loginOverlay" class="fixed inset-0 z-[200] bg-slate-900/90 flex items-center justify-center p-6 transition-all">
-        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md animate-slide-up text-center border border-slate-200 dark:border-slate-700">
+    <div id="loginOverlay" class="fixed inset-0 z-[200] bg-slate-900/90 flex items-center justify-center p-6">
+        <div class="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm animate-slide-up text-center border border-slate-200 dark:border-slate-700">
             <i class="fas fa-leaf text-4xl text-klk mb-4"></i>
-            <h2 class="text-2xl font-black mb-2">PT. KMA Mill</h2>
-            <p class="text-slate-500 text-sm mb-8 font-medium italic">Silakan masukkan nama Anda untuk melihat pesanan.</p>
-            <input type="text" id="userInputName" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 mb-4 outline-none text-center font-bold" placeholder="Nama Lengkap Anda">
-            <button onclick="userLogin()" class="w-full bg-klk text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Masuk Ke Sistem</button>
+            <h2 class="text-2xl font-black mb-1">PT. KMA Mill</h2>
+            <p class="text-slate-500 text-xs mb-8 font-medium italic">Silakan masuk dengan akun Anda.</p>
+            
+            <div class="space-y-4">
+                <input type="text" id="loginUser" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Nama Pengguna">
+                <input type="password" id="loginPass" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Kata Sandi">
+                <button onclick="handleLogin()" class="w-full bg-klk text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Login</button>
+            </div>
         </div>
     </div>
 
     <div id="mainApp" class="flex flex-col md:flex-row h-screen overflow-hidden hidden">
         <aside class="hidden md:flex w-64 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex-col shadow-sm">
             <div class="p-8">
-                <h1 class="text-xl font-black text-klk tracking-tighter uppercase flex items-center gap-2">
-                    <i class="fas fa-leaf text-2xl"></i> PT. KMA Mill
+                <h1 class="text-xl font-black text-klk uppercase flex items-center gap-2">
+                    <i class="fas fa-leaf"></i> PT. KMA Mill
                 </h1>
-                <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">Personal Mode</p>
+                <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">User Session</p>
                 <p id="activeUserDisplay" class="text-[11px] font-black text-klk mt-2 truncate"></p>
             </div>
             <nav class="flex-1 px-4 space-y-2">
                 <button onclick="currentFilter='all'; currentPage=1; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all active:scale-95 text-xs font-bold">
                     <i class="fas fa-box w-6"></i> Pesanan Saya
                 </button>
-                <div class="admin-only mt-6 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin Tools</div>
+                <div class="admin-only mt-6 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Administrator</div>
                 <button onclick="currentFilter='Pending'; currentPage=1; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-xs font-bold">
-                    <i class="fas fa-clock w-6 text-yellow-500"></i> Semua Pending
+                    <i class="fas fa-clock w-6 text-yellow-500"></i> Pantau Semua
                 </button>
             </nav>
             <div class="p-6 border-t dark:border-slate-700 space-y-3">
-                <button onclick="toggleDarkMode()" class="w-full flex items-center justify-center gap-2 py-2 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">
-                    <i id="theme-icon" class="fas fa-sun"></i> <span>Terang atau Gelap</span>
-                </button>
-                <button onclick="userLogout()" class="w-full flex items-center justify-center gap-2 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all hover:bg-red-500 hover:text-white">
-                    <i class="fas fa-sign-out-alt"></i> Keluar
-                </button>
+                <button onclick="toggleDarkMode()" class="w-full flex justify-center py-2 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest">Terang atau Gelap</button>
+                <button onclick="location.reload()" class="w-full py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition">Keluar</button>
             </div>
         </aside>
 
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="md:hidden bg-white dark:bg-slate-800 p-4 border-b dark:border-slate-700 flex justify-between items-center shadow-sm">
-                <h1 class="text-lg font-black text-klk uppercase italic">PT. KMA Mill</h1>
+            <header class="md:hidden bg-white dark:bg-slate-800 p-4 border-b dark:border-slate-700 flex justify-between items-center">
+                <h1 class="text-lg font-black text-klk italic">PT. KMA Mill</h1>
                 <button onclick="toggleAdmin()" class="text-slate-400 p-2"><i class="fas fa-lock"></i></button>
             </header>
 
             <div class="flex-1 overflow-y-auto p-4 md:p-10">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+                <div class="flex flex-col md:flex-row justify-between gap-6 mb-10">
                     <div>
-                        <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight leading-none">Internal Order</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium italic">Data milik Anda pribadi.</p>
+                        <h2 class="text-3xl font-extrabold tracking-tight">Cloud Indent</h2>
+                        <p id="userStatusNote" class="text-slate-500 mt-2 font-medium italic italic">Menampilkan pesanan pribadi Anda.</p>
                     </div>
-                    <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-                        <button onclick="openModal()" class="bg-klk hover:bg-klkdark text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-green-200 transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <i class="fas fa-plus-circle text-lg"></i> Buat Pesanan
-                        </button>
-                    </div>
+                    <button onclick="openModal()" class="bg-klk hover:bg-klkdark text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-plus-circle text-lg"></i> Pesanan Baru
+                    </button>
                 </div>
 
                 <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
@@ -87,23 +83,22 @@
                             <thead>
                                 <tr class="bg-slate-50/50 dark:bg-slate-700/50 border-b dark:border-slate-700 text-[11px] font-black text-slate-400 uppercase tracking-widest">
                                     <th class="px-8 py-5">Tanggal</th>
-                                    <th class="px-8 py-5 admin-only">Pemesan</th>
-                                    <th class="px-8 py-5">Nama Barang</th>
+                                    <th id="thPemesan" class="px-8 py-5 hidden">Pemesan</th>
+                                    <th class="px-8 py-5">Barang</th>
                                     <th class="px-8 py-5 text-center">Jumlah</th>
                                     <th class="px-8 py-5 text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic">
-                                <tr><td colspan="5" class="p-10 text-center animate-pulse">Memuat data Anda...</td></tr>
+                            <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic italic">
+                                <tr><td colspan="5" class="p-10 text-center animate-pulse">Menghubungkan...</td></tr>
                             </tbody>
                         </table>
                     </div>
-                    
-                    <div class="p-6 bg-slate-50/30 dark:bg-slate-800/50 border-t dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400 italic">
+                    <div class="p-6 border-t dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase text-slate-400">
                         <p id="paginationInfo"></p>
                         <div class="flex gap-2">
-                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl hover:bg-slate-100 disabled:opacity-30" id="prevBtn">Prev</button>
-                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl hover:bg-slate-100 disabled:opacity-30" id="nextBtn">Next</button>
+                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl disabled:opacity-30" id="prevBtn">Prev</button>
+                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl disabled:opacity-30" id="nextBtn">Next</button>
                         </div>
                     </div>
                 </div>
@@ -111,22 +106,22 @@
         </main>
     </div>
 
-    <button onclick="toggleAdmin()" class="fixed bottom-6 right-6 w-12 h-12 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-full shadow-2xl flex items-center justify-center text-slate-400 hover:text-klk transition-all z-[100] active:scale-90">
+    <button onclick="toggleAdmin()" class="fixed bottom-6 right-6 w-12 h-12 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-full shadow-2xl flex items-center justify-center text-slate-400 hover:text-klk z-[100] active:scale-90">
         <i id="lock-icon-float" class="fas fa-lock text-sm"></i>
     </button>
 
     <div id="modal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[110] p-4">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
             <div class="p-8 border-b dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Form Pesanan</h3>
+                <h3 class="text-xl font-extrabold">Form Pesanan</h3>
                 <button onclick="closeModal()" class="text-slate-400 text-2xl">&times;</button>
             </div>
             <form id="orderForm" class="p-8 space-y-5">
-                <input type="text" id="nama" readonly class="w-full bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-slate-400 font-bold" placeholder="Nama Pemesan">
+                <input type="text" id="nama" readonly class="w-full bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold">
                 <input type="text" id="barang" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white" placeholder="Nama Barang">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="jumlah" value="1" min="1" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold">
-                    <input type="text" id="satuan" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold" placeholder="Pcs/Box">
+                    <input type="number" id="jumlah" value="1" min="1" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold">
+                    <input type="text" id="satuan" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold" placeholder="Pcs/Box">
                 </div>
                 <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all">Kirim Pesanan</button>
             </form>
@@ -135,12 +130,12 @@
 
     <div id="logModal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[120] p-4">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up p-8">
-            <h3 class="text-xl font-extrabold mb-1">Riwayat Barang</h3>
+            <h3 class="text-xl font-extrabold mb-1">Status Barang</h3>
             <p id="logBarang" class="text-klk font-bold text-xs uppercase mb-6"></p>
             <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-700">
-                <div class="relative flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10"><i class="fas fa-plus text-xs"></i></div><div><p class="font-bold text-sm">Pesanan Dibuat</p><p id="logTglPesan" class="text-[10px] text-slate-400"></p></div></div>
+                <div class="relative flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10"><i class="fas fa-plus text-xs"></i></div><div><p class="font-bold text-sm">Pesanan Diterima</p><p id="logTglPesan" class="text-[10px] text-slate-400"></p></div></div>
                 <div class="relative flex items-center gap-4"><div id="iconIndent" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-truck-loading text-xs"></i></div><div><p class="font-bold text-sm">Status Indent</p><p id="logTglIndent" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
-                <div class="relative flex items-center gap-4"><div id="iconSelesai" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-check-circle text-xs"></i></div><div><p class="font-bold text-sm">Selesai/Diterima</p><p id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
+                <div class="relative flex items-center gap-4"><div id="iconSelesai" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-check-circle text-xs"></i></div><div><p class="font-bold text-sm">Tiba / Selesai</p><p id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
             </div>
             <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Tutup</button>
         </div>
@@ -148,6 +143,24 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzg0bS9ScLtKqpWuqxt7Fi1j_lwZIi_2Uib2r0fuBeoPQ0FNOpVKgkc9bej-LTbtzJ3/exec";
+        
+        // --- DATA USER INTERNAL (Edit Di Sini) ---
+        const USER_DATABASE = [
+            { user: "wira", pass: "shift1" },
+            { user: "azis", pass: "shift2" },
+            { user: "petrus", pass: "workshop354" },
+            { user: "hagerin", pass: "electrical354" },
+            { user: "rahmat", pass: "store354" },
+            { user: "samsul", pass: "kantor354" },
+            { user: "ilham", pass: "lab354" },
+            { user: "gabe", pass: "sustain354" },
+            { user: "roby", pass: "roby354" },
+            { user: "hasan", pass: "hasan354" },
+            { user: "alvin", pass: "alvin354" },
+            { user: "mahendra", pass: "mahendra354" },
+            { user: "Admin", pass: "KLK2026" }
+        ];
+
         let orders = [];
         let isAdmin = false;
         let currentFilter = 'all';
@@ -156,19 +169,22 @@
         let activeUser = "";
 
         // LOGIN SYSTEM
-        function userLogin() {
-            const nameInput = document.getElementById('userInputName').value.trim();
-            if (nameInput.length < 3) return alert("Masukkan nama lengkap Anda!");
-            activeUser = nameInput;
-            document.getElementById('loginOverlay').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('activeUserDisplay').innerText = activeUser;
-            document.getElementById('nama').value = activeUser;
-            fetchData();
-        }
-
-        function userLogout() {
-            location.reload();
+        function handleLogin() {
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
+            
+            const foundUser = USER_DATABASE.find(x => x.user.toLowerCase() === u.toLowerCase() && x.pass === p);
+            
+            if (foundUser) {
+                activeUser = foundUser.user;
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('activeUserDisplay').innerText = activeUser;
+                document.getElementById('nama').value = activeUser;
+                fetchData();
+            } else {
+                alert("Login Gagal! Nama atau Password salah.");
+            }
         }
 
         async function fetchData() {
@@ -185,13 +201,14 @@
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
-            
-            // FILTER BERDASARKAN USER AKTIF (KECUALI ADMIN)
             let filteredData = orders;
+            
             if (!isAdmin) {
                 filteredData = filteredData.filter(o => o.nama.toLowerCase() === activeUser.toLowerCase());
-            } else if (currentFilter !== 'all') {
-                filteredData = filteredData.filter(o => o.status === currentFilter);
+                document.getElementById('thPemesan').classList.add('hidden');
+            } else {
+                if (currentFilter !== 'all') filteredData = filteredData.filter(o => o.status === currentFilter);
+                document.getElementById('thPemesan').classList.remove('hidden');
             }
 
             const startIndex = (currentPage - 1) * rowsPerPage;
@@ -204,7 +221,7 @@
 
             tbody.innerHTML = '';
             if (paginatedData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 italic">Tidak ada pesanan atas nama Anda.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 italic">Data kosong.</td></tr>`;
                 return;
             }
 
@@ -218,7 +235,7 @@
                 tr.onclick = (e) => { if(e.target.tagName !== 'SELECT') showLog(order); };
                 tr.innerHTML = `
                     <td class="px-8 py-5 text-[10px] text-slate-400 font-mono">${order.tanggal}</td>
-                    <td class="px-8 py-5 font-bold admin-only">${order.nama}</td>
+                    <td class="px-8 py-5 font-bold ${isAdmin ? '' : 'hidden'}">${order.nama}</td>
                     <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.barang}</td>
                     <td class="px-8 py-5 text-center font-black">${order.jumlah} <span class="text-[9px] opacity-40 ml-1">${order.satuan}</span></td>
                     <td class="px-8 py-5 text-center">
@@ -236,7 +253,7 @@
             });
         }
 
-        // LOGIKA LAINNYA TETAP SAMA
+        // LOG MODAL
         function showLog(order) {
             document.getElementById('logBarang').innerText = `${order.barang}`;
             document.getElementById('logTglPesan').innerText = order.tanggal;
@@ -270,8 +287,8 @@
         }
 
         function toggleAdmin() {
-            if (!isAdmin) { if (prompt("Password Admin PT. KMA Mill:") === "KLK2026") { isAdmin = true; document.body.classList.add('is-admin'); document.getElementById('role-tag').innerText = "Admin Mode"; document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk"; } }
-            else { isAdmin = false; document.body.classList.remove('is-admin'); document.getElementById('role-tag').innerText = "Personal Mode"; document.getElementById('lock-icon-float').className = "fas fa-lock"; }
+            if (!isAdmin) { if (prompt("Password Admin PT. KMA Mill:") === "KLK2026") { isAdmin = true; document.body.classList.add('is-admin'); document.getElementById('role-tag').innerText = "Admin View"; document.getElementById('userStatusNote').innerText = "Mode Admin: Menampilkan seluruh data pesanan."; document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk"; } }
+            else { isAdmin = false; document.body.classList.remove('is-admin'); document.getElementById('role-tag').innerText = "User Session"; document.getElementById('userStatusNote').innerText = "Menampilkan pesanan pribadi Anda."; document.getElementById('lock-icon-float').className = "fas fa-lock"; }
             renderTable();
         }
 
