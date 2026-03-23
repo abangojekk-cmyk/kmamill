@@ -264,11 +264,18 @@
         }
 
         async function handleDelete(nama, barang) {
-            if (confirm(`Hapus pesanan "${barang}"?`)) {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'delete', nama: nama, barang: barang }) });
-                fetchData();
-            }
-        }
+    if (confirm(`Hapus pesanan "${barang}" milik ${nama}?`)) {
+        // Tampilkan loading sederhana jika perlu
+        await fetch(API_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify({ action: 'delete', nama: nama, barang: barang }) 
+        });
+        
+        // Tunggu sebentar lalu refresh data
+        setTimeout(() => { fetchData(); }, 500);
+    }
+}
 
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
