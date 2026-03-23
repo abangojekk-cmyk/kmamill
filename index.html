@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PT. KMA Mill - Cloud Indent System</title>
+    <title>PT. KMA Mill - Internal Order</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
@@ -18,7 +18,6 @@
         .admin-only { display: none; }
         body.is-admin .admin-only { display: block; }
         body { transition: background-color 0.5s ease; }
-        tr.cursor-pointer:hover { background-color: rgba(34, 197, 94, 0.05); }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 overflow-hidden">
@@ -33,11 +32,11 @@
                 <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Staff Mode</p>
             </div>
             <nav class="flex-1 px-4 space-y-2">
-                <button onclick="currentFilter='all'; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all active:scale-95">
+                <button onclick="currentFilter='all'; currentPage=1; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all active:scale-95">
                     <i class="fas fa-th-large w-6"></i> Semua Pesanan
                 </button>
                 <div class="admin-only mt-6 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin Tools</div>
-                <button onclick="currentFilter='Pending'; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition">
+                <button onclick="currentFilter='Pending'; currentPage=1; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition">
                     <i class="fas fa-clock w-6 text-yellow-500"></i> Cek Pending
                 </button>
             </nav>
@@ -57,12 +56,18 @@
             <div class="flex-1 overflow-y-auto p-4 md:p-10">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                     <div>
-                        <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight leading-none">Cloud Indent</h2>
-                        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium italic italic">Urutan Terbaru di Atas (Klik baris untuk riwayat).</p>
+                        <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight leading-none">Internal Order</h2>
+                        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium italic">Sistem Monitoring PT. KMA Mill</p>
                     </div>
-                    <button onclick="openModal()" class="w-full md:w-auto bg-klk hover:bg-klkdark text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-green-200 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fas fa-plus-circle text-lg"></i> Buat Pesanan
-                    </button>
+                    <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="searchInput" oninput="currentPage=1; renderTable();" placeholder="Cari barang/nama..." class="w-full md:w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 pl-10 pr-4 py-4 rounded-2xl text-xs outline-none focus:border-klk transition-all shadow-sm">
+                        </div>
+                        <button onclick="openModal()" class="bg-klk hover:bg-klkdark text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-green-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas fa-plus-circle text-lg"></i> Pesanan Baru
+                        </button>
+                    </div>
                 </div>
 
                 <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
@@ -82,6 +87,14 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <div class="p-6 bg-slate-50/30 dark:bg-slate-800/50 border-t dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p id="paginationInfo" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic"></p>
+                        <div class="flex gap-2">
+                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-[10px] font-black uppercase hover:bg-slate-100 transition disabled:opacity-30" id="prevBtn">Prev</button>
+                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-[10px] font-black uppercase hover:bg-slate-100 transition disabled:opacity-30" id="nextBtn">Next</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -94,7 +107,7 @@
     <div id="modal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[110] p-4">
         <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
             <div class="p-8 border-b dark:border-slate-700 flex justify-between items-center">
-                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Form Pesanan</h3>
+                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white tracking-tight">Form Pesanan</h3>
                 <button onclick="closeModal()" class="text-slate-400 text-2xl">&times;</button>
             </div>
             <form id="orderForm" class="p-8 space-y-5">
@@ -104,49 +117,8 @@
                     <input type="number" id="jumlah" value="1" min="1" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold">
                     <input type="text" id="satuan" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white font-bold" placeholder="Pcs/Box">
                 </div>
-                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all">Kirim Ke Database</button>
+                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Kirim Ke Database</button>
             </form>
-        </div>
-    </div>
-
-    <div id="logModal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[120] p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
-            <div class="p-8 border-b dark:border-slate-700">
-                <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Riwayat Pesanan</h3>
-                <p id="logBarang" class="text-klk font-bold text-sm uppercase"></p>
-            </div>
-            <div class="p-8">
-                <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-                    <div class="relative flex items-center justify-between md:justify-start">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
-                            <i class="fas fa-plus text-xs"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="font-bold text-slate-800 dark:text-white">Pesanan Dibuat</div>
-                            <div id="logTglPesan" class="text-[10px] text-slate-400">--/--/----</div>
-                        </div>
-                    </div>
-                    <div class="relative flex items-center justify-between md:justify-start">
-                        <div id="iconIndent" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
-                            <i class="fas fa-truck-loading text-xs"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="font-bold text-slate-800 dark:text-white">Status Indent</div>
-                            <div id="logTglIndent" class="text-[10px] text-slate-400 italic">Belum diproses</div>
-                        </div>
-                    </div>
-                    <div class="relative flex items-center justify-between md:justify-start">
-                        <div id="iconSelesai" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0">
-                            <i class="fas fa-check-circle text-xs"></i>
-                        </div>
-                        <div class="ml-4">
-                            <div class="font-bold text-slate-800 dark:text-white">Barang Diterima</div>
-                            <div id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu penyelesaian</div>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-xs uppercase tracking-widest">Tutup</button>
-            </div>
         </div>
     </div>
 
@@ -155,40 +127,57 @@
         let orders = [];
         let isAdmin = false;
         let currentFilter = 'all';
+        
+        // VARIABLE PAGINATION
+        let currentPage = 1;
+        const rowsPerPage = 10;
 
         async function fetchData() {
             try {
                 const response = await fetch(API_URL);
                 const rawData = await response.json();
-                
-                // MAPPING DATA & SORTIR TERBARU DI ATAS (Reverse array)
+                // Data terbaru di paling atas
                 orders = rawData.map(row => ({
                     tanggal: String(row[0] || "").replace(/^'/, ''), 
                     nama: row[1], barang: row[2], jumlah: row[3], satuan: row[4], status: row[5]
-                })).reverse(); 
-
+                })).reverse();
                 renderTable();
             } catch (e) { console.error(e); }
         }
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            const displayData = currentFilter === 'all' ? orders : orders.filter(o => o.status === currentFilter);
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            
+            // 1. Filter Data (Berdasarkan Status & Pencarian)
+            let filteredData = orders;
+            if (currentFilter !== 'all') filteredData = filteredData.filter(o => o.status === currentFilter);
+            if (searchVal) {
+                filteredData = filteredData.filter(o => 
+                    o.nama.toLowerCase().includes(searchVal) || 
+                    o.barang.toLowerCase().includes(searchVal)
+                );
+            }
 
-            displayData.forEach((order) => {
+            // 2. Potong Data untuk Pagination
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+
+            // 3. Update Info Pagination
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+            document.getElementById('paginationInfo').innerText = `Halaman ${currentPage} dari ${totalPages} (${filteredData.length} Pesanan)`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+
+            tbody.innerHTML = '';
+            paginatedData.forEach((order) => {
                 let statusColor = "bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400";
                 if(order.status === 'Indent') statusColor = "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400";
                 if(order.status === 'Selesai') statusColor = "bg-green-50 text-klk dark:bg-green-900/20 dark:text-klk";
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700 cursor-pointer";
-                
-                // Klik pada baris (kecuali bagian select admin) membuka Riwayat
-                tr.onclick = (e) => {
-                    if(e.target.tagName !== 'SELECT') showLog(order);
-                };
-
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700";
                 tr.innerHTML = `
                     <td class="px-8 py-5 text-[11px] text-slate-400 font-mono tracking-tight">${order.tanggal}</td>
                     <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.nama}</td>
@@ -209,36 +198,17 @@
             });
         }
 
-        // FUNGSI RIWAYAT (LOG)
-        function showLog(order) {
-            document.getElementById('logBarang').innerText = `${order.barang} (${order.nama})`;
-            document.getElementById('logTglPesan').innerText = order.tanggal;
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { 
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            let filteredData = orders;
+            if (currentFilter !== 'all') filteredData = filteredData.filter(o => o.status === currentFilter);
+            if (searchVal) filteredData = filteredData.filter(o => o.nama.toLowerCase().includes(searchVal) || o.barang.toLowerCase().includes(searchVal));
             
-            // Logika sederhana untuk visual riwayat berdasarkan status saat ini
-            const iIndent = document.getElementById('iconIndent');
-            const iSelesai = document.getElementById('iconSelesai');
-            const tIndent = document.getElementById('logTglIndent');
-            const tSelesai = document.getElementById('logTglSelesai');
-
-            if(order.status === 'Pending') {
-                iIndent.className = iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0";
-                tIndent.innerText = "Belum diproses"; tSelesai.innerText = "Menunggu penyelesaian";
-            } else if (order.status === 'Indent') {
-                iIndent.className = "flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white z-10 shrink-0 shadow-lg";
-                iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 z-10 shrink-0";
-                tIndent.innerText = "Sedang diproses/dipesan"; tSelesai.innerText = "Menunggu barang tiba";
-            } else if (order.status === 'Selesai') {
-                iIndent.className = "flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white z-10 shrink-0";
-                iSelesai.className = "flex items-center justify-center w-10 h-10 rounded-full bg-klk text-white z-10 shrink-0 shadow-lg";
-                tIndent.innerText = "Sudah diproses"; tSelesai.innerText = "Sudah diterima gudang/pemesan";
-            }
-
-            document.getElementById('logModal').classList.remove('hidden');
+            if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) { currentPage++; renderTable(); } 
         }
 
-        function closeLog() { document.getElementById('logModal').classList.add('hidden'); }
-
-        // FUNGSI ADMIN & FORM (TETAP)
+        // FUNGSI DASAR (TIDAK BERUBAH)
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -284,7 +254,7 @@
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
         fetchData();
-        setInterval(fetchData, 10000);
+        setInterval(fetchData, 30000); // Sinkron tiap 30 detik untuk menghemat baterai/data
     </script>
 </body>
 </html>
