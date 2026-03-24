@@ -36,32 +36,47 @@
     </div>
 
     <div id="mainApp" class="flex flex-col md:flex-row h-screen overflow-hidden hidden">
-        <aside class="hidden md:flex w-64 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex-col shadow-sm">
-            <div class="p-8">
-                <h1 class="text-xl font-black text-klk uppercase flex items-center gap-2">
-                    <i class="fas fa-leaf"></i> PT. KMA Mill
-                </h1>
-                <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">User Session</p>
-                <p id="activeUserDisplay" class="text-[11px] font-black text-klk mt-2 truncate"></p>
+        
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-[150] w-64 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex flex-col shadow-2xl transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0">
+            <div class="p-8 flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-black text-klk uppercase flex items-center gap-2">
+                        <i class="fas fa-leaf text-2xl"></i> PT. KMA Mill
+                    </h1>
+                    <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">User Session</p>
+                    <p id="activeUserDisplay" class="text-[11px] font-black text-klk mt-2 truncate"></p>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-400 text-xl">&times;</button>
             </div>
+            
             <nav class="flex-1 px-4 space-y-2">
-                <button onclick="currentFilter='all'; currentPage=1; renderTable();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md transition-all text-xs font-bold">
+                <button onclick="currentFilter='all'; currentPage=1; renderTable(); toggleSidebar();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md text-xs font-bold">
                     <i class="fas fa-box w-6"></i> Pesanan Saya
                 </button>
                 <div class="admin-only mt-6 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Administrator</div>
-                <button onclick="currentFilter='Pending'; currentPage=1; renderTable();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-xs font-bold">
+                <button onclick="currentFilter='Pending'; currentPage=1; renderTable(); toggleSidebar();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-xs font-bold">
                     <i class="fas fa-clock w-6 text-yellow-500"></i> Pantau Semua
                 </button>
             </nav>
+
             <div class="p-6 border-t dark:border-slate-700 space-y-3">
-                <button onclick="toggleDarkMode()" class="w-full py-2 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest">Terang atau Gelap</button>
-                <button onclick="location.reload()" class="w-full py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition">Keluar</button>
+                <button onclick="toggleDarkMode()" class="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95">
+                    <i class="fas fa-adjust"></i> <span>Terang atau Gelap</span>
+                </button>
+                <button onclick="location.reload()" class="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all active:scale-95">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
+                </button>
             </div>
         </aside>
 
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-[140] hidden md:hidden"></div>
+
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="md:hidden bg-white dark:bg-slate-800 p-4 border-b dark:border-slate-700 flex justify-between items-center">
-                <h1 class="text-lg font-black text-klk italic">PT. KMA Mill</h1>
+            <header class="md:hidden bg-white dark:bg-slate-800 p-4 border-b dark:border-slate-700 flex justify-between items-center shadow-sm">
+                <button onclick="toggleSidebar()" class="text-klk p-2 text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="text-lg font-black text-klk uppercase italic">PT. KMA Mill</h1>
                 <button onclick="toggleAdmin()" class="text-slate-400 p-2"><i class="fas fa-lock"></i></button>
             </header>
 
@@ -371,6 +386,20 @@
         }
 
         setInterval(fetchData, 45000);
+        javascript
+// Fungsi untuk Membuka/Tutup Sidebar di HP
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+    } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+    }
+}
     </script>
 </body>
 </html>
