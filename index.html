@@ -264,31 +264,40 @@
                 const canEdit = isAdmin || order.status === 'Pending';
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700 cursor-pointer";
-                tr.onclick = (e) => { if(!e.target.closest('button') && e.target.tagName !== 'SELECT') showLog(order); };
-                tr.innerHTML = `
-                    <td class="px-8 py-5 text-[10px] text-slate-400 font-mono">${order.tanggal}</td>
-                    <td class="px-8 py-5 font-bold ${isAdmin ? '' : 'hidden'}">${order.nama}</td>
-                    <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.barang}</td>
-                    <td class="px-8 py-5 text-center font-black">${order.jumlah} <span class="text-[9px] opacity-40 ml-1">${order.satuan}</span></td>
-                    <td class="px-8 py-5 text-center">
-                        ${isAdmin ? 
-                            `<select onchange="updateStatusRemote('${order.nama}', '${order.barang}', this.value)" class="${sCol} text-[10px] font-black uppercase px-3 py-1 rounded-full outline-none">
-                                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="Indent" ${order.status === 'Indent' ? 'selected' : ''}>Indent</option>
-                                <option value="Selesai" ${order.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
-                            </select>` : 
-                            `<span class="${sCol} px-4 py-1.5 rounded-full text-[10px] font-black uppercase">${order.status}</span>`
-                        }
-                    </td>
-                    <td class="px-8 py-5 text-center flex justify-center gap-2">
-                        ${canEdit ? `
-                            <button onclick="openEditModal('${order.nama}', '${order.barang}', ${order.jumlah}, '${order.satuan}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition"><i class="fas fa-edit"></i></button>
-                            <button onclick="handleDelete('${order.nama}', '${order.barang}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition"><i class="fas fa-trash-alt"></i></button>
-                        ` : '<span class="text-[9px] text-slate-300">Diproses</span>'}
-                    </td>
-                `;
-                tbody.appendChild(tr);
+tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700 cursor-pointer";
+               tr.onclick = (e) => { 
+    if(!e.target.closest('button') && e.target.tagName !== 'SELECT') {
+        showLog(order); 
+    }
+};
+
+tr.innerHTML = `
+    <td class="px-8 py-5 text-[10px] text-slate-400 font-mono">${order.tanggal}</td>
+    <td class="px-8 py-5 font-bold ${isAdmin ? '' : 'hidden'}">${order.nama}</td>
+    <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.barang}</td>
+    <td class="px-8 py-5 text-center font-black">${order.jumlah} <span class="text-[9px] opacity-40 ml-1">${order.satuan}</span></td>
+    <td class="px-8 py-5 text-center">
+        ${isAdmin ? 
+            `<select onchange="updateStatusRemote('${order.nama}', '${order.barang}', this.value)" class="${sCol} text-[10px] font-black uppercase px-3 py-1 rounded-full outline-none">
+                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                <option value="Indent" ${order.status === 'Indent' ? 'selected' : ''}>Indent</option>
+                <option value="Selesai" ${order.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+            </select>` : 
+            `<span class="${sCol} px-4 py-1.5 rounded-full text-[10px] font-black uppercase">${order.status}</span>`
+        }
+    </td>
+    <td class="px-8 py-5 text-center flex justify-center gap-4">
+        ${canEdit ? `
+            <button onclick="event.stopPropagation(); openEditModal('${order.nama}', '${order.barang}', ${order.jumlah}, '${order.satuan}')" class="text-blue-500 p-3 -m-2 active:bg-blue-100 rounded-full transition">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="event.stopPropagation(); handleDelete('${order.nama}', '${order.barang}')" class="text-red-500 p-3 -m-2 active:bg-red-100 rounded-full transition">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        ` : '<span class="text-[9px] text-slate-300">Proses</span>'}
+    </td>
+`;
+tbody.appendChild(tr);
             });
         }
 
