@@ -2,7 +2,7 @@
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PT. KMA Mill - Internal Order System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -13,58 +13,72 @@
         }
     </script>
     <style>
-        @keyframes slide-up { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .animate-slide-up { animation: slide-up 0.3s ease-out; }
         .admin-only { display: none; }
         body.is-admin .admin-only { display: block; }
-        body { transition: background-color 0.5s ease; }
+        
+        /* Lapisan Aksi agar tombol & dropdown di atas lapisan tabel */
+        .action-layer {
+            position: relative;
+            z-index: 50;
+        }
+        
+        .btn-touch {
+            padding: 10px;
+            margin: -5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        /* Styling Dropdown Status agar rapi di HP */
+        .status-select {
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            outline: none;
+            border: none;
+            text-align: center;
+        }
+
+        tr td { position: relative; }
+        body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 overflow-hidden">
 
     <div id="loginOverlay" class="fixed inset-0 z-[200] bg-slate-900/90 flex items-center justify-center p-6">
-        <div class="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm animate-slide-up text-center border border-slate-200 dark:border-slate-700">
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-2xl w-full max-w-sm text-center border dark:border-slate-700">
             <i class="fas fa-leaf text-4xl text-klk mb-4"></i>
-            <h2 class="text-2xl font-black mb-1">PT. KMA Mill</h2>
-            <p class="text-slate-500 text-xs mb-8 font-medium italic">Masuk ke sistem </p>
+            <h2 class="text-2xl font-black mb-6 uppercase tracking-tight">PT. KMA Mill</h2>
             <div class="space-y-4">
-                <input type="text" id="loginUser" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Nama Pengguna">
-                <input type="password" id="loginPass" class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Kata Sandi">
-                <button onclick="handleLogin()" class="w-full bg-klk text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-klkdark shadow-lg transition-all active:scale-95">Masuk</button>
+                <input type="text" id="loginUser" class="w-full bg-slate-50 dark:bg-slate-700 border-2 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Username">
+                <input type="password" id="loginPass" class="w-full bg-slate-50 dark:bg-slate-700 border-2 rounded-2xl p-4 outline-none font-bold text-center" placeholder="Password">
+                <button onclick="handleLogin()" class="w-full bg-klk text-white py-4 rounded-2xl font-black uppercase shadow-lg active:scale-95 transition-all">Masuk</button>
             </div>
         </div>
     </div>
 
     <div id="mainApp" class="flex flex-col md:flex-row h-screen overflow-hidden hidden">
-        
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-[150] w-64 bg-white dark:bg-slate-800 border-r dark:border-slate-700 flex flex-col shadow-2xl transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0">
-            <div class="p-8 flex justify-between items-center">
-                <div>
-                    <h1 class="text-xl font-black text-klk uppercase flex items-center gap-2">
-                        <i class="fas fa-leaf text-2xl"></i> PT. KMA Mill
-                    </h1>
-                    <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">User Session</p>
-                    <p id="activeUserDisplay" class="text-[11px] font-black text-klk mt-2 truncate"></p>
-                </div>
-                <button onclick="toggleSidebar()" class="md:hidden text-slate-400 text-xl">&times;</button>
+            <div class="p-8">
+                <h1 class="text-xl font-black text-klk uppercase flex items-center gap-2 italic">PT. KMA Mill</h1>
+                <p id="role-tag" class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">User Session</p>
+                <p id="activeUserDisplay" class="text-[11px] font-black text-klk mt-2 truncate"></p>
             </div>
-            
             <nav class="flex-1 px-4 space-y-2">
-                <button onclick="currentFilter='all'; currentPage=1; renderTable(); toggleSidebar();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md text-xs font-bold">
+                <button onclick="currentFilter='all'; renderTable(); toggleSidebar();" class="w-full flex items-center px-4 py-3 bg-klk text-white rounded-xl shadow-md text-xs font-bold">
                     <i class="fas fa-box w-6"></i> Pesanan Saya
                 </button>
                 <div class="admin-only mt-6 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Administrator</div>
-                <button onclick="currentFilter='Pending'; currentPage=1; renderTable(); toggleSidebar();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-xs font-bold">
+                <button onclick="currentFilter='Pending'; renderTable(); toggleSidebar();" class="admin-only w-full flex items-center px-4 py-3 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-xs font-bold">
                     <i class="fas fa-clock w-6 text-yellow-500"></i> Pantau Semua
                 </button>
             </nav>
-
             <div class="p-6 border-t dark:border-slate-700 space-y-3">
-                <button onclick="toggleDarkMode()" class="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95">
-                    <i class="fas fa-adjust"></i> <span>Terang atau Gelap</span>
+                <button onclick="toggleDarkMode()" class="w-full py-3 bg-slate-100 dark:bg-slate-700 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                    Terang atau Gelap
                 </button>
-                <button onclick="location.reload()" class="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all active:scale-95">
-                    <i class="fas fa-sign-out-alt"></i> Keluar
+                <button onclick="location.reload()" class="w-full py-3 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                    Keluar
                 </button>
             </div>
         </aside>
@@ -73,9 +87,7 @@
 
         <main class="flex-1 flex flex-col overflow-hidden">
             <header class="md:hidden bg-white dark:bg-slate-800 p-4 border-b dark:border-slate-700 flex justify-between items-center shadow-sm">
-                <button onclick="toggleSidebar()" class="text-klk p-2 text-xl">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button onclick="toggleSidebar()" class="text-klk p-2 text-xl"><i class="fas fa-bars"></i></button>
                 <h1 class="text-lg font-black text-klk uppercase italic">PT. KMA Mill</h1>
                 <button onclick="toggleAdmin()" class="text-slate-400 p-2"><i class="fas fa-lock"></i></button>
             </header>
@@ -83,12 +95,10 @@
             <div class="flex-1 overflow-y-auto p-4 md:p-10">
                 <div class="flex flex-col md:flex-row justify-between gap-6 mb-10">
                     <div>
-                        <h2 class="text-3xl font-extrabold tracking-tight">Internal Order</h2>
-                        <p id="userStatusNote" class="text-slate-500 mt-2 font-medium italic">Menampilkan pesanan pribadi Anda.</p>
+                        <h2 class="text-3xl font-extrabold tracking-tight uppercase">Internal Order</h2>
+                        <p class="text-slate-500 mt-2 font-medium italic italic">Digital Management System.</p>
                     </div>
-                    <button onclick="openModal()" class="bg-klk hover:bg-klkdark text-white px-8 py-4 rounded-2xl font-bold shadow-xl transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-plus-circle text-lg"></i> Pesanan Baru
-                    </button>
+                    <button onclick="openModal()" class="bg-klk text-white px-8 py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all">+ Pesanan Baru</button>
                 </div>
 
                 <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
@@ -99,61 +109,41 @@
                                     <th class="px-8 py-5">Tanggal</th>
                                     <th id="thPemesan" class="px-8 py-5 hidden">Pemesan</th>
                                     <th class="px-8 py-5">Barang</th>
-                                    <th class="px-8 py-5 text-center">Jumlah</th>
+                                    <th class="px-8 py-5 text-center">Qty</th>
                                     <th class="px-8 py-5 text-center">Status</th>
                                     <th class="px-8 py-5 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic">
-                                <tr><td colspan="6" class="p-10 text-center animate-pulse">Menghubungkan Database...</td></tr>
+                            <tbody id="tableBody" class="divide-y divide-slate-50 dark:divide-slate-700 font-medium italic text-xs md:text-sm">
+                                <tr><td colspan="6" class="p-10 text-center animate-pulse text-slate-400">Menghubungkan Database...</td></tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="p-6 border-t dark:border-slate-700 flex justify-between items-center text-[10px] font-black uppercase text-slate-400">
-                        <p id="paginationInfo"></p>
-                        <div class="flex gap-2">
-                            <button onclick="prevPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border rounded-xl disabled:opacity-30" id="prevBtn">Prev</button>
-                            <button onclick="nextPage()" class="px-4 py-2 bg-white dark:bg-slate-700 border rounded-xl disabled:opacity-30" id="nextBtn">Next</button>
-                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <button onclick="toggleAdmin()" class="fixed bottom-6 right-6 w-12 h-12 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-full shadow-2xl flex items-center justify-center text-slate-400 hover:text-klk z-[100] active:scale-90">
+    <button onclick="toggleAdmin()" class="fixed bottom-6 right-6 w-12 h-12 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-full shadow-2xl flex items-center justify-center text-slate-400 z-[100] active:scale-90">
         <i id="lock-icon-float" class="fas fa-lock text-sm"></i>
     </button>
 
-    <div id="modal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[110] p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up">
+    <div id="modal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-center justify-center z-[160] p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden border dark:border-slate-700 animate-slide-up">
             <div class="p-8 border-b dark:border-slate-700 flex justify-between items-center">
-                <h3 id="modalTitle" class="text-xl font-extrabold">Form Pesanan</h3>
-                <button onclick="closeModal()" class="text-slate-400 text-2xl">&times;</button>
+                <h3 id="modalTitle" class="text-xl font-black italic uppercase">Form Order</h3>
+                <button onclick="closeModal()" class="text-slate-400 text-3xl">&times;</button>
             </div>
-            <form id="orderForm" class="p-8 space-y-5">
+            <form id="orderForm" class="p-8 space-y-4">
                 <input type="hidden" id="editOriginalBarang">
-                <input type="text" id="nama" readonly class="w-full bg-slate-100 dark:bg-slate-700/50 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold">
-                <input type="text" id="barang" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none dark:text-white" placeholder="Nama Barang">
+                <input type="text" id="nama" readonly class="w-full bg-slate-100 dark:bg-slate-700 p-4 rounded-xl outline-none font-bold">
+                <input type="text" id="barang" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 p-4 rounded-xl outline-none" placeholder="Nama Barang">
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="jumlah" value="1" min="1" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold">
-                    <input type="text" id="satuan" required class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-100 dark:border-slate-600 rounded-2xl p-4 outline-none font-bold" placeholder="Pcs/Box">
+                    <input type="number" id="jumlah" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 p-4 rounded-xl outline-none" placeholder="Jumlah">
+                    <input type="text" id="satuan" required class="w-full bg-slate-50 dark:bg-slate-700 border-2 p-4 rounded-xl outline-none" placeholder="Satuan">
                 </div>
-                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg">Simpan Pesanan</button>
+                <button type="submit" id="submitBtn" class="w-full bg-klk text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-lg active:scale-95">Simpan Data</button>
             </form>
-        </div>
-    </div>
-
-    <div id="logModal" class="fixed inset-0 bg-slate-900/40 hidden backdrop-blur-sm flex items-end md:items-center justify-center z-[120] p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up p-8 text-center">
-            <h3 class="text-xl font-extrabold mb-1">Status Barang</h3>
-            <p id="logBarang" class="text-klk font-bold text-xs uppercase mb-6"></p>
-            <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-700">
-                <div class="relative flex items-center gap-4 text-left"><div class="w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10"><i class="fas fa-plus text-xs"></i></div><div><p class="font-bold text-sm">Pesanan Diterima</p><p id="logTglPesan" class="text-[10px] text-slate-400"></p></div></div>
-                <div class="relative flex items-center gap-4 text-left"><div id="iconIndent" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-truck-loading text-xs"></i></div><div><p class="font-bold text-sm">Status Indent</p><p id="logTglIndent" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
-                <div class="relative flex items-center gap-4 text-left"><div id="iconSelesai" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"><i class="fas fa-check-circle text-xs"></i></div><div><p class="font-bold text-sm">Selesai</p><p id="logTglSelesai" class="text-[10px] text-slate-400 italic">Menunggu</p></div></div>
-            </div>
-            <button onclick="closeLog()" class="w-full mt-10 bg-slate-100 dark:bg-slate-700 py-4 rounded-xl font-bold text-[10px] uppercase">Tutup</button>
         </div>
     </div>
 
@@ -161,28 +151,20 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbw4N4VDbSuNeYZbDNlB7Ji7xcaOKtgzAU2JuaDcODNh6pgisD8Shm95xg-YkIw_Qk-F/exec";
         
         const USER_DATABASE = [
-            { user: "wira", pass: "shift1" },
-            { user: "azis", pass: "shift2" },
-            { user: "petrus", pass: "workshop354" },
-            { user: "hagerin", pass: "electrical354" },
-            { user: "rahmat", pass: "store354" },
-            { user: "samsul", pass: "kantor354" },
-            { user: "ilham", pass: "lab354" },
-            { user: "gabe", pass: "sustain354" },
-            { user: "roby", pass: "roby354" },
-            { user: "hasan", pass: "hasan354" },
-            { user: "alvin", pass: "alvin354" },
-            { user: "mahendra", pass: "mahendra354" },
+            { user: "wira", pass: "shift1" }, { user: "azis", pass: "shift2" },
+            { user: "petrus", pass: "workshop354" }, { user: "hagerin", pass: "electrical354" },
+            { user: "rahmat", pass: "store354" }, { user: "samsul", pass: "kantor354" },
+            { user: "ilham", pass: "lab354" }, { user: "gabe", pass: "sustain354" },
+            { user: "roby", pass: "roby354" }, { user: "hasan", pass: "hasan354" },
+            { user: "alvin", pass: "alvin354" }, { user: "mahendra", pass: "mahendra354" },
             { user: "Admin", pass: "KLK2026" }
         ];
 
         let orders = [];
         let isAdmin = false;
-        let currentFilter = 'all';
-        let currentPage = 1;
-        const rowsPerPage = 10;
         let activeUser = "";
         let isEditMode = false;
+        let currentFilter = 'all';
 
         function handleLogin() {
             const u = document.getElementById('loginUser').value.trim();
@@ -195,116 +177,96 @@
                 document.getElementById('activeUserDisplay').innerText = activeUser;
                 document.getElementById('nama').value = activeUser;
                 fetchData();
-            } else { alert("Login Gagal!"); }
+            } else { alert("User/Password Salah!"); }
         }
 
         async function fetchData() {
-    try {
-        const response = await fetch(API_URL);
-        const rawData = await response.json();
-        
-        orders = rawData.map(row => {
-            let tglMentah = row[0];
-            let tglRapi = "";
-
-            // Fungsi pembersih tanggal ISO ke format Indonesia (DD/MM/YYYY)
-            if (tglMentah && String(tglMentah).includes('T')) {
-                const d = new Date(tglMentah);
-                const day = String(d.getDate()).padStart(2, '0');
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const year = d.getFullYear();
-                tglRapi = `${day}/${month}/${year}`;
-            } else {
-                // Jika sudah rapi atau format lain, hapus tanda petik satu (') jika ada
-                tglRapi = String(tglMentah || "").replace(/^'/, '');
-            }
-
-            return {
-                tanggal: tglRapi, 
-                nama: row[1], 
-                barang: row[2], 
-                jumlah: row[3], 
-                satuan: row[4], 
-                status: row[5]
-            };
-        }).reverse();
-        
-        renderTable();
-    } catch (e) { 
-        console.error("Gagal memuat data:", e); 
-    }
-}
+            try {
+                const response = await fetch(API_URL);
+                const rawData = await response.json();
+                orders = rawData.map(row => ({
+                    tanggal: String(row[0]).split('T')[0],
+                    nama: row[1], barang: row[2], jumlah: row[3], satuan: row[4], status: row[5]
+                })).reverse();
+                renderTable();
+            } catch (e) { console.error(e); }
+        }
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
-            let filteredData = orders;
+            let filtered = isAdmin ? (currentFilter === 'all' ? orders : orders.filter(o => o.status === currentFilter)) : orders.filter(o => o.nama.toLowerCase() === activeUser.toLowerCase());
             
-            if (!isAdmin) {
-                filteredData = filteredData.filter(o => o.nama.toLowerCase() === activeUser.toLowerCase());
-                document.getElementById('thPemesan').classList.add('hidden');
-            } else {
-                if (currentFilter !== 'all') filteredData = filteredData.filter(o => o.status === currentFilter);
-                document.getElementById('thPemesan').classList.remove('hidden');
-            }
-
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
-            const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
-            
-            document.getElementById('paginationInfo').innerText = `Hal ${currentPage}/${totalPages} (${filteredData.length} Data)`;
-            document.getElementById('prevBtn').disabled = currentPage === 1;
-            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            if (isAdmin) document.getElementById('thPemesan').classList.remove('hidden');
+            else document.getElementById('thPemesan').classList.add('hidden');
 
             tbody.innerHTML = '';
-            paginatedData.forEach((order) => {
-                let sCol = "bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20";
-                if(order.status === 'Indent') sCol = "bg-blue-50 text-blue-600 dark:bg-blue-900/20";
-                if(order.status === 'Selesai') sCol = "bg-green-50 text-klk dark:bg-green-900/20";
-
+            filtered.forEach((order) => {
+                let sCol = order.status === 'Selesai' ? 'bg-green-100 text-green-700' : (order.status === 'Indent' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700');
                 const canEdit = isAdmin || order.status === 'Pending';
 
                 const tr = document.createElement('tr');
-tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition border-b dark:border-slate-700 cursor-pointer";
-               tr.onclick = (e) => { 
-    if(!e.target.closest('button') && e.target.tagName !== 'SELECT') {
-        showLog(order); 
-    }
-};
-
-tr.innerHTML = `
-    <td class="px-8 py-5 text-[10px] text-slate-400 font-mono">${order.tanggal}</td>
-    <td class="px-8 py-5 font-bold ${isAdmin ? '' : 'hidden'}">${order.nama}</td>
-    <td class="px-8 py-5 font-bold text-slate-700 dark:text-slate-200">${order.barang}</td>
-    <td class="px-8 py-5 text-center font-black">${order.jumlah} <span class="text-[9px] opacity-40 ml-1">${order.satuan}</span></td>
-    <td class="px-8 py-5 text-center">
-        ${isAdmin ? 
-            `<select onchange="updateStatusRemote('${order.nama}', '${order.barang}', this.value)" class="${sCol} text-[10px] font-black uppercase px-3 py-1 rounded-full outline-none">
-                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                <option value="Indent" ${order.status === 'Indent' ? 'selected' : ''}>Indent</option>
-                <option value="Selesai" ${order.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
-            </select>` : 
-            `<span class="${sCol} px-4 py-1.5 rounded-full text-[10px] font-black uppercase">${order.status}</span>`
-        }
-    </td>
-    <td class="px-8 py-5 text-center flex justify-center gap-4">
-        ${canEdit ? `
-            <button onclick="event.stopPropagation(); openEditModal('${order.nama}', '${order.barang}', ${order.jumlah}, '${order.satuan}')" class="text-blue-500 p-3 -m-2 active:bg-blue-100 rounded-full transition">
-                <i class="fas fa-edit"></i>
-            </button>
-            <button onclick="event.stopPropagation(); handleDelete('${order.nama}', '${order.barang}')" class="text-red-500 p-3 -m-2 active:bg-red-100 rounded-full transition">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        ` : '<span class="text-[9px] text-slate-300">Proses</span>'}
-    </td>
-`;
-tbody.appendChild(tr);
+                tr.className = "border-b dark:border-slate-700 hover:bg-slate-50/50 transition";
+                
+                tr.innerHTML = `
+                    <td class="px-6 py-5 text-[10px] text-slate-400 font-mono">${order.tanggal}</td>
+                    <td class="px-6 py-5 font-bold ${isAdmin ? '' : 'hidden'} text-klk uppercase">${order.nama}</td>
+                    <td class="px-6 py-5 font-bold text-slate-700 dark:text-slate-200">${order.barang}</td>
+                    <td class="px-6 py-5 text-center font-black">${order.jumlah} <span class="text-[9px] uppercase">${order.satuan}</span></td>
+                    <td class="px-6 py-5 text-center">
+                        ${isAdmin ? `
+                            <select onchange="updateStatusRemote('${order.nama}', '${order.barang}', this.value)" class="status-select ${sCol} px-3 py-1.5 rounded-full text-[10px] font-black uppercase shadow-sm">
+                                <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Indent" ${order.status === 'Indent' ? 'selected' : ''}>Indent</option>
+                                <option value="Selesai" ${order.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                            </select>
+                        ` : `
+                            <span class="${sCol} px-3 py-1.5 rounded-full text-[10px] font-black uppercase">${order.status}</span>
+                        `}
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                        <div class="flex justify-center gap-6 action-layer">
+                            ${canEdit ? `
+                                <button type="button" onclick="startEdit('${order.nama}', '${order.barang}', ${order.jumlah}, '${order.satuan}')" class="btn-touch text-blue-500 active:scale-125">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" onclick="startDelete('${order.nama}', '${order.barang}')" class="btn-touch text-red-500 active:scale-125">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            ` : '<span class="text-[9px] text-slate-300 italic uppercase">Locked</span>'}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        // --- FUNGSI AKSI ---
-        function openEditModal(nama, barang, jumlah, satuan) {
+        async function updateStatusRemote(nama, barang, statusBaru) {
+            console.log("Updating status:", barang, "to", statusBaru);
+            await fetch(API_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ action: 'update', nama: nama, barang: barang, status: statusBaru }) 
+            });
+            fetchData();
+        }
+
+        async function startDelete(nama, barang) {
+            if (confirm(`Hapus data barang: ${barang}?`)) {
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify({ action: 'delete', nama: nama, barang: barang })
+                    });
+                    alert("Berhasil dihapus.");
+                    fetchData();
+                } catch (err) { alert("Koneksi Gagal."); }
+            }
+        }
+
+        function startEdit(nama, barang, jumlah, satuan) {
             isEditMode = true;
-            document.getElementById('modalTitle').innerText = "Edit Pesanan";
+            document.getElementById('modalTitle').innerText = "Edit Order";
             document.getElementById('editOriginalBarang').value = barang;
             document.getElementById('barang').value = barang;
             document.getElementById('jumlah').value = jumlah;
@@ -312,103 +274,46 @@ tbody.appendChild(tr);
             openModal();
         }
 
-       async function handleDelete(nama, barang) {
-    if (confirm(`Hapus pesanan "${barang}" milik ${nama}?`)) {
-        // Berikan tanda loading pada tombol agar user tahu sedang diproses
-        console.log("Mencoba menghapus:", nama, barang);
-        
-        try {
-            await fetch(API_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({ 
-                    action: 'delete', 
-                    nama: nama, 
-                    barang: barang 
-                }) 
-            });
-            
-            // Tunggu 1 detik supaya Google Sheets selesai menghapus barisnya
-            setTimeout(() => {
-                fetchData(); // Ambil data terbaru
-                alert("Perintah hapus dikirim. Jika belum hilang, silakan refresh halaman.");
-            }, 1000);
-
-        } catch (err) {
-            alert("Gagal menghubungi server.");
-        }
-    }
-}
-
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn'); btn.innerText = "Memproses..."; btn.disabled = true;
-            const d = new Date(); const tgl = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-            
+            const btn = document.getElementById('submitBtn'); btn.innerText = "Processing..."; btn.disabled = true;
             const payload = {
                 action: isEditMode ? 'update_full' : 'create',
                 oldBarang: document.getElementById('editOriginalBarang').value,
-                tanggal: tgl,
+                tanggal: new Date().toLocaleDateString('id-ID'), 
                 nama: activeUser,
                 barang: document.getElementById('barang').value,
                 jumlah: document.getElementById('jumlah').value,
                 satuan: document.getElementById('satuan').value,
                 status: 'Pending'
             };
-
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            closeModal(); 
-            btn.innerText = "Simpan Pesanan"; btn.disabled = false; 
-            fetchData();
+            closeModal(); btn.innerText = "Simpan Data"; btn.disabled = false; fetchData();
         });
 
-        // UI HELPERS
-        function openModal() { document.getElementById('modal').classList.remove('hidden'); }
-        function closeModal() { 
-            document.getElementById('modal').classList.add('hidden'); 
-            document.getElementById('orderForm').reset();
-            document.getElementById('nama').value = activeUser;
-            document.getElementById('modalTitle').innerText = "Pesanan Baru";
-            isEditMode = false;
-        }
-        function showLog(order) {
-            document.getElementById('logBarang').innerText = `${order.barang}`;
-            document.getElementById('logTglPesan').innerText = order.tanggal;
-            const iI = document.getElementById('iconIndent'), iS = document.getElementById('iconSelesai');
-            if(order.status === 'Pending') { iI.className = iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; }
-            else if (order.status === 'Indent') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10 shadow-lg"; iS.className = "w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center z-10"; }
-            else if (order.status === 'Selesai') { iI.className = "w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center z-10"; iS.className = "w-10 h-10 rounded-full bg-klk text-white flex items-center justify-center z-10 shadow-lg"; }
-            document.getElementById('logModal').classList.remove('hidden');
-        }
-        function closeLog() { document.getElementById('logModal').classList.add('hidden'); }
-        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
-        function nextPage() { if (currentPage < Math.ceil(orders.length / rowsPerPage)) { currentPage++; renderTable(); } }
-        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
         function toggleAdmin() {
-            if (!isAdmin) { if (prompt("Password Admin:") === "KLK2026") { isAdmin = true; document.body.classList.add('is-admin'); document.getElementById('role-tag').innerText = "Admin View"; document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk"; } }
-            else { isAdmin = false; document.body.classList.remove('is-admin'); document.getElementById('role-tag').innerText = "User Session"; document.getElementById('lock-icon-float').className = "fas fa-lock"; }
+            if (isAdmin) { 
+                isAdmin = false; 
+                document.body.classList.remove('is-admin');
+                document.getElementById('lock-icon-float').className = "fas fa-lock";
+            } else { 
+                const pin = prompt("PIN Admin:");
+                if (pin === "KLK2026") {
+                    isAdmin = true; 
+                    document.body.classList.add('is-admin');
+                    document.getElementById('lock-icon-float').className = "fas fa-lock-open text-klk";
+                }
+            }
             renderTable();
         }
-        async function updateStatusRemote(nama, barang, statusBaru) {
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'update', nama: nama, barang: barang, status: statusBaru }) });
-            fetchData();
-        }
 
-        setInterval(fetchData, 45000);
-        javascript
-// Fungsi untuk Membuka/Tutup Sidebar di HP
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    
-    if (sidebar.classList.contains('-translate-x-full')) {
-        sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
-    } else {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-    }
-}
+        function openModal() { document.getElementById('modal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); isEditMode = false; }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); }
+        function toggleDarkMode() { document.documentElement.classList.toggle('dark'); }
+        
+        fetchData();
+        setInterval(fetchData, 30000);
     </script>
 </body>
 </html>
